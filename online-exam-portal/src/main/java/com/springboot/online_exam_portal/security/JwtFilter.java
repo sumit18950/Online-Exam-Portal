@@ -16,7 +16,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
@@ -37,45 +39,53 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String authHeader = request.getHeader("Authorization");
 
-        // ✅ Check if header exists and starts with Bearer
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-
-            String token = authHeader.substring(7);
-
-            try {
-                // ✅ Extract email from token
-                String email = jwtUtil.extractEmail(token);
-
-                // ✅ Check if user is not already authenticated
-                if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-
-                    // 🔥 Fetch user from DB
-                    User user = userRepository.findByEmail(email)
-                            .orElseThrow(() -> new RuntimeException("User not found"));
-
-                    // 🔥 Extract role
-                    String role = user.getRole().getRoleName();
-                    String authority = role.startsWith("ROLE_") ? role : "ROLE_" + role;
-
-                    // ✅ Convert role to Spring Security format
-                    List<SimpleGrantedAuthority> authorities =
-                            List.of(new SimpleGrantedAuthority(authority));
-
-                    // ✅ Create authentication token
-                    UsernamePasswordAuthenticationToken auth =
-                            new UsernamePasswordAuthenticationToken(email, null, authorities);
-                    auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                    // ✅ Set authentication
-                    SecurityContextHolder.getContext().setAuthentication(auth);
-                }
-
-            } catch (Exception e) {
-                System.out.println("JWT ERROR: " + e.getMessage());
-            }
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response);
+            return;
         }
 
-        // ✅ Continue filter chain
+        String token = authHeader.substring(7).trim();
+        if (token.isEmpty() || !jwtUtil.validateToken(token)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        var existingAuth = SecurityContextHolder.getContext().getAuthentication();
+        if (existingAuth != null) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        String email = jwtUtil.extractEmail(token);
+        if (email == null || email.isBlank()) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        userRepository.findByEmail(email).ifPresent(user -> {
+            if (user.getRole() == null || user.getRole().getRoleName() == null) {
+                return;
+            }
+
+            String roleName = user.getRole().getRoleName().trim().toUpperCase(Locale.ROOT);
+            if (roleName.isEmpty()) {
+                return;
+            }
+
+            String authority = roleName.startsWith("ROLE_") ? roleName : "ROLE_" + roleName;
+            SimpleGrantedAuthority grantedAuthority = new SimpleGrantedAuthority(authority);
+
+            UsernamePasswordAuthenticationToken authenticationToken =
+                    new UsernamePasswordAuthenticationToken(
+                            email,
+                            null,
+                            Collections.singletonList(grantedAuthority)
+                    );
+            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+        });
+
         filterChain.doFilter(request, response);
     }
 }

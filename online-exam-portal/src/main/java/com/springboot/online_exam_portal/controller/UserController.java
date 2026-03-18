@@ -12,10 +12,15 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Locale;
 
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
+
+    private static final String ROLE_ADMIN = "ROLE_ADMIN";
+    private static final String ROLE_TEACHER = "ROLE_TEACHER";
+    private static final String ROLE_STUDENT = "STUDENT";
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
@@ -31,17 +36,19 @@ public class UserController {
 
     // ✅ 1. GET PROFILE
     @GetMapping("/profile")
-    public User getProfile(Authentication auth){
-        return userRepository.findByEmail(auth.getName())
+    public User getProfile(Authentication authentication){
+        String email = authentication.getName();
+        return userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
     // ✅ 2. UPDATE PROFILE
     @PutMapping("/update-profile")
     public User updateProfile(@RequestBody UpdateProfileRequest request,
-                              Authentication auth){
+                              Authentication authentication){
 
-        User user = userRepository.findByEmail(auth.getName())
+        String email = authentication.getName();
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         user.setUsername(request.getUsername());
@@ -52,9 +59,10 @@ public class UserController {
     // ✅ 3. CHANGE PASSWORD
     @PostMapping("/change-password")
     public String changePassword(@RequestBody ChangePasswordRequest request,
-                                 Authentication auth){
+                                 Authentication authentication){
 
-        User user = userRepository.findByEmail(auth.getName())
+        String email = authentication.getName();
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         if(!passwordEncoder.matches(request.getOldPassword(), user.getPasswordHash())){
@@ -73,11 +81,39 @@ public class UserController {
         return userRepository.findAll();
     }
 
-    // ✅ 5. GET USER BY ID (ADMIN)
-    @GetMapping("/by-id/{id}")
-    public User getUserById(@PathVariable Long id) {
-        return userRepository.findById(id)
+    // ✅ 5. GET USER BY ID (ADMIN, or TEACHER for STUDENT users only)
+    @GetMapping("/{id}")
+    public User getUserById(@PathVariable Long id, Authentication authentication) {
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(a -> ROLE_ADMIN.equals(a.getAuthority()));
+        if (isAdmin) {
+            return user;
+        }
+
+        boolean isTeacher = authentication.getAuthorities().stream()
+                .anyMatch(a -> ROLE_TEACHER.equals(a.getAuthority()));
+        if (!isTeacher) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
+        }
+
+        String targetRole = user.getRole() == null || user.getRole().getRoleName() == null
+                ? ""
+                : user.getRole().getRoleName().trim().toUpperCase(Locale.ROOT);
+
+        if (!ROLE_STUDENT.equals(targetRole)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Teachers can access only STUDENT users");
+        }
+
+        return user;
+    }
+
+    // Backward-compatible route.
+    @GetMapping("/by-id/{id}")
+    public User getUserByIdLegacy(@PathVariable Long id, Authentication authentication) {
+        return getUserById(id, authentication);
     }
 
     // ✅ 6. UPDATE USER (ADMIN)

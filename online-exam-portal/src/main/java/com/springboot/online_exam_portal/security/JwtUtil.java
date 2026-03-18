@@ -35,4 +35,16 @@ public class JwtUtil {
                 .getBody()
                 .getSubject();
     }
+
+    public boolean validateToken(String token) {
+        try {
+            io.jsonwebtoken.Jwts.parserBuilder()
+                    .setSigningKey(getSigningKey())
+                    .build()
+                    .parseClaimsJws(token);
+            return true;
+        } catch (Exception ex) {
+            return false;
+        }
+    }
 }

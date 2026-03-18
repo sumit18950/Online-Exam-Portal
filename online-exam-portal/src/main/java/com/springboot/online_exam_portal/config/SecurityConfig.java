@@ -57,16 +57,16 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/users/change-password").authenticated()
 
                         // ADMIN ONLY
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-
-                        // TEACHER and ADMIN
-                        .requestMatchers("/api/teacher/**").hasAnyRole("TEACHER", "ADMIN")
-
-                        // STRICT ADMIN ENDPOINTS
                         .requestMatchers(HttpMethod.GET, "/api/users/all").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/users/by-id/*").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/users/*").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/users/*").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/users/{id}").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/users/{id}").hasRole("ADMIN")
+
+                        // ADMIN + TEACHER (teacher access is constrained in controller to STUDENT users only)
+                        .requestMatchers(HttpMethod.GET, "/api/users/{id}").hasAnyRole("ADMIN", "TEACHER")
+                        .requestMatchers(HttpMethod.GET, "/api/users/by-id/{id}").hasAnyRole("ADMIN", "TEACHER")
+
+                        .requestMatchers("/api/questions/**").hasRole("TEACHER")
+                        .requestMatchers(HttpMethod.POST, "/api/exams/attempt").hasRole("STUDENT")
 
                         // ALL other APIs require login
                         .anyRequest().authenticated()
