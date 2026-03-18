@@ -6,17 +6,17 @@ import lombok.*;
 @Entity
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
-@Table(name="Options") // Match your DB table name
+@Table(name="options")
 public class Option {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private String optionText;
-    private Boolean isCorrect;
+    private String option_text;
+    private Boolean is_correct;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="question_id")
     @JsonBackReference
-    private Questions question;
+    private Questions question; // Links back to Question
 }
 

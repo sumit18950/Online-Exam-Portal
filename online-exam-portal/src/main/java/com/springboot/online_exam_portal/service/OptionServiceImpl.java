@@ -36,8 +36,8 @@ public class OptionServiceImpl implements OptionService {
         Option existing = optionRepo.findById(optionId)
                 .orElseThrow(() -> new RuntimeException("Option not found"));
 
-        existing.setOptionText(optionDetails.getOptionText());
-        existing.setIsCorrect(optionDetails.getIsCorrect());
+        existing.setOption_text(optionDetails.getOption_text());
+        existing.setIs_correct(optionDetails.getIs_correct());
 
         return optionRepo.save(existing);
     }

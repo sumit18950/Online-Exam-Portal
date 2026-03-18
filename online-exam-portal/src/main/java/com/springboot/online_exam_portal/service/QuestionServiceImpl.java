@@ -38,9 +38,9 @@ public class QuestionServiceImpl implements QuestionService {
     public Questions updateQuestion(Integer id, Questions questionDetails) {
         Questions existing = getQuestionById(id);
 
-        existing.setQuestionText(questionDetails.getQuestionText());
-        existing.setQuestionType(questionDetails.getQuestionType());
-        existing.setDifficulty(questionDetails.getDifficulty());
+        existing.setQuestion_text(questionDetails.getQuestion_text());
+        existing.setQuestion_type(questionDetails.getQuestion_type());
+
         existing.setMarks(questionDetails.getMarks());
 
         // Update Options: Clear existing and add new list to maintain sync
