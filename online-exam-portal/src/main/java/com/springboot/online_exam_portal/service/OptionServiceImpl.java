@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class OptionServiceImpl implements OptionService {
@@ -62,6 +63,6 @@ public class OptionServiceImpl implements OptionService {
 
     @Override
     public void deleteOption(Integer optionId) {
-        optionRepo.deleteById(optionId);
+        optionRepo.deleteById(Objects.requireNonNull(optionId));
     }
 }

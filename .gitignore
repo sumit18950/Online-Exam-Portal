@@ -1,0 +1,10 @@
+# IDE files
+.vscode/
+.idea/
+
+# Build output
+online-exam-portal/target/
+
+# OS files
+*.DS_Store
+Thumbs.db
