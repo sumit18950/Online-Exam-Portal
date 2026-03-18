@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class OptionServiceImpl implements OptionService {
@@ -20,7 +21,7 @@ public class OptionServiceImpl implements OptionService {
 
     @Override
     public Option saveOption(Integer questionId, Option option) {
-        Questions question = questionRepo.findById(questionId)
+        Questions question = questionRepo.findById(Objects.requireNonNull(questionId))
                 .orElseThrow(() -> new RuntimeException("Question not found"));
         option.setQuestion(question);
         return optionRepo.save(option);
@@ -33,7 +34,7 @@ public class OptionServiceImpl implements OptionService {
 
     @Override
     public Option updateOption(Integer optionId, Option optionDetails) {
-        Option existing = optionRepo.findById(optionId)
+        Option existing = optionRepo.findById(Objects.requireNonNull(optionId))
                 .orElseThrow(() -> new RuntimeException("Option not found"));
 
         existing.setOption_text(optionDetails.getOption_text());
@@ -44,6 +45,6 @@ public class OptionServiceImpl implements OptionService {
 
     @Override
     public void deleteOption(Integer optionId) {
-        optionRepo.deleteById(optionId);
+        optionRepo.deleteById(Objects.requireNonNull(optionId));
     }
 }
