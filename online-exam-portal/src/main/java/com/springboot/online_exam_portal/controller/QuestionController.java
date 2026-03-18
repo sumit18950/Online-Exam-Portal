@@ -21,20 +21,44 @@ public class QuestionController {
         return new ResponseEntity<>(questionService.saveQuestionAndOptions(question), HttpStatus.CREATED);
     }
 
-    @GetMapping
-    public List<Questions> getAll() {
-        return questionService.getAllQuestions();
+    // Get all questions by subject ID
+    @GetMapping("/subject/{subjectId}")
+    public List<Questions> getBySubjectId(@PathVariable Integer subjectId) {
+        return questionService.getQuestionsBySubjectId(subjectId);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Questions> update(@PathVariable Integer id, @RequestBody Questions question) {
-        return ResponseEntity.ok(questionService.updateQuestion(id, question));
+    // Get a particular question by subject ID and question ID
+    @GetMapping("/subject/{subjectId}/question/{questionId}")
+    public ResponseEntity<Questions> getBySubjectIdAndQuestionId(
+            @PathVariable Integer subjectId, @PathVariable Integer questionId) {
+        Questions question = questionService.getQuestionById(questionId);
+        if (question.getSubject() == null || question.getSubject().getId() != subjectId) {
+            throw new RuntimeException("Question " + questionId + " does not belong to subject " + subjectId);
+        }
+        return ResponseEntity.ok(question);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Integer id) {
-        questionService.deleteQuestion(id);
+    // Update question by subject ID and question ID
+    @PutMapping("/subject/{subjectId}/question/{questionId}")
+    public ResponseEntity<Questions> update(
+            @PathVariable Integer subjectId, @PathVariable Integer questionId,
+            @RequestBody Questions question) {
+        Questions existing = questionService.getQuestionById(questionId);
+        if (existing.getSubject() == null || existing.getSubject().getId() != subjectId) {
+            throw new RuntimeException("Question " + questionId + " does not belong to subject " + subjectId);
+        }
+        return ResponseEntity.ok(questionService.updateQuestion(questionId, question));
+    }
+
+    // Delete question by subject ID and question ID
+    @DeleteMapping("/subject/{subjectId}/question/{questionId}")
+    public ResponseEntity<Void> delete(
+            @PathVariable Integer subjectId, @PathVariable Integer questionId) {
+        Questions existing = questionService.getQuestionById(questionId);
+        if (existing.getSubject() == null || existing.getSubject().getId() != subjectId) {
+            throw new RuntimeException("Question " + questionId + " does not belong to subject " + subjectId);
+        }
+        questionService.deleteQuestion(questionId);
         return ResponseEntity.noContent().build();
     }
 }
-

@@ -6,6 +6,7 @@ import com.springboot.online_exam_portal.repository.OptionRepository;
 import com.springboot.online_exam_portal.repository.QuestionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -21,7 +22,7 @@ public class OptionServiceImpl implements OptionService {
     @Override
     public Option saveOption(Integer questionId, Option option) {
         Questions question = questionRepo.findById(questionId)
-                .orElseThrow(() -> new RuntimeException("Question not found"));
+                .orElseThrow(() -> new RuntimeException("Question not found with id: " + questionId));
         option.setQuestion(question);
         return optionRepo.save(option);
     }
@@ -34,12 +35,29 @@ public class OptionServiceImpl implements OptionService {
     @Override
     public Option updateOption(Integer optionId, Option optionDetails) {
         Option existing = optionRepo.findById(optionId)
-                .orElseThrow(() -> new RuntimeException("Option not found"));
+                .orElseThrow(() -> new RuntimeException("Option not found with id: " + optionId));
 
-        existing.setOption_text(optionDetails.getOption_text());
-        existing.setIs_correct(optionDetails.getIs_correct());
+        existing.setOptionText(optionDetails.getOptionText());
+        existing.setIsCorrect(optionDetails.getIsCorrect());
 
         return optionRepo.save(existing);
+    }
+
+    @Override
+    @Transactional
+    public List<Option> updateAllOptions(Integer questionId, List<Option> options) {
+        Questions question = questionRepo.findById(questionId)
+                .orElseThrow(() -> new RuntimeException("Question not found with id: " + questionId));
+
+        // Clear old options and replace with new ones
+        question.getOptions().clear();
+        options.forEach(opt -> {
+            opt.setQuestion(question);
+            question.getOptions().add(opt);
+        });
+
+        questionRepo.save(question);
+        return question.getOptions();
     }
 
     @Override
