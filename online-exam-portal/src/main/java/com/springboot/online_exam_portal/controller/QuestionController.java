@@ -10,7 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/questions")
-@CrossOrigin("*") // Useful for frontend connection
+@CrossOrigin("*")
 public class QuestionController {
 
     @Autowired
