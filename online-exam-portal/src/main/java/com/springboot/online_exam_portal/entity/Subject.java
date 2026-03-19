@@ -1,5 +1,6 @@
 package com.springboot.online_exam_portal.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,7 +23,10 @@ public class Subject {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    // Cascade delete: If subject is deleted, all its exams are deleted
+    // COMMENT: @JsonManagedReference = "parent" side. Exams list IS included in JSON output.
+    // The "child" side (@JsonBackReference on Exams.subject) is automatically excluded
+    // to prevent infinite loop: Subject→Exams→Subject→Exams→...
+    @JsonManagedReference
     @OneToMany(mappedBy = "subject", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Exams> exams;
 }
