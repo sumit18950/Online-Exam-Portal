@@ -7,6 +7,7 @@ import com.springboot.online_exam_portal.repository.SubjectRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class ExamServiceImpl implements ExamService {
@@ -14,7 +15,7 @@ public class ExamServiceImpl implements ExamService {
     @Autowired private SubjectRepository subjectRepo;
     @Autowired private ExamsRepository examRepo;
 
-    @Override public Subject saveSubject(Subject subject) { return subjectRepo.save(subject); }
+    @Override public Subject saveSubject(Subject subject) { return subjectRepo.save(Objects.requireNonNull(subject)); }
 
     @Override public List<Subject> getAllSubjects() { return subjectRepo.findAll(); }
 

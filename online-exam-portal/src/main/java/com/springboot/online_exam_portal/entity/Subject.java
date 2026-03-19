@@ -1,5 +1,6 @@
 package com.springboot.online_exam_portal.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,5 +25,6 @@ public class Subject {
 
     // Cascade delete: If subject is deleted, all its exams are deleted
     @OneToMany(mappedBy = "subject", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<Exams> exams;
 }
