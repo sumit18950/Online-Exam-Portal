@@ -30,9 +30,10 @@ public class Questions {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Subject subject;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "question_text", columnDefinition = "TEXT")
     private String questionText;
 
+    @Column(name = "question_type")
     private String questionType;
 
     private Integer marks;
