@@ -65,7 +65,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/users/{id}").hasAnyRole("ADMIN", "TEACHER")
                         .requestMatchers(HttpMethod.GET, "/api/users/by-id/{id}").hasAnyRole("ADMIN", "TEACHER")
 
-                        .requestMatchers("/api/questions/**").hasRole("TEACHER")
+                        .requestMatchers("/api/questions/**").hasAnyRole("ADMIN", "TEACHER")
                         .requestMatchers(HttpMethod.POST, "/api/exams/attempt").hasRole("STUDENT")
 
                         // ALL other APIs require login
