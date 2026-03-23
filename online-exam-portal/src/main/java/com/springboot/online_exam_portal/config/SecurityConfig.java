@@ -37,10 +37,10 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-                // ❌ Disable CSRF (for APIs)
+                //  Disable CSRF (for APIs)
                 .csrf(csrf -> csrf.disable())
 
-                // ❌ No session (JWT)
+                //  No session (JWT)
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
