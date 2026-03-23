@@ -1,315 +1,263 @@
 package com.springboot.online_exam_portal.service;
 
-import com.springboot.online_exam_portal.entity.*;
-import com.springboot.online_exam_portal.repository.*;
 import com.springboot.online_exam_portal.dto.ExamRequest;
 import com.springboot.online_exam_portal.dto.ExamResponse;
-import com.springboot.online_exam_portal.dto.SubjectRequest;
-import com.springboot.online_exam_portal.exception.UnauthorizedException;
+import com.springboot.online_exam_portal.entity.Exams;
+import com.springboot.online_exam_portal.entity.Subject;
+import com.springboot.online_exam_portal.entity.User;
+import com.springboot.online_exam_portal.repository.ExamsRepository;
+import com.springboot.online_exam_portal.repository.QuestionRepository;
+import com.springboot.online_exam_portal.repository.SubjectRepository;
+import com.springboot.online_exam_portal.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
-import java.time.LocalDateTime;
-import java.time.LocalDate;
-import java.time.LocalTime;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+
 import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 import java.util.stream.Collectors;
+import java.time.LocalDateTime;
 
 @Service
 public class ExamServiceImpl implements ExamService {
 
+    private static final String ROLE_ADMIN = "ROLE_ADMIN";
+    private static final String ROLE_TEACHER = "ROLE_TEACHER";
+
     @Autowired private SubjectRepository subjectRepo;
     @Autowired private ExamsRepository examRepo;
-    @Autowired private RoleRepository roleRepo;
+    @Autowired private QuestionRepository questionRepo;
     @Autowired private UserRepository userRepo;
-    @Autowired private ExamEnrollmentRepository examEnrollmentRepo;
 
-    // ==================== Subject CRUD ====================
-    @Override 
-    public Subject saveSubject(Subject subject) { 
-        return subjectRepo.save(subject); 
-    }
+    // ─── Subject ────────────────────────────────────────────────────────────
 
-    /**
-     * COMMENT: Accepts SubjectRequest DTO where JSON field can be "subject" OR "subjectName"
-     * Maps it to Subject entity and saves to database
-     */
     @Override
-    public Subject saveSubjectFromRequest(SubjectRequest subjectRequest) {
-        // COMMENT: Validate that subjectName is not null/empty
-        if (subjectRequest.getSubjectName() == null || subjectRequest.getSubjectName().isBlank()) {
-            throw new RuntimeException("Subject name cannot be null or empty. Use field 'subject' or 'subjectName' in your request body.");
-        }
-        // COMMENT: Map DTO to entity
-        Subject subject = new Subject();
-        subject.setSubjectName(subjectRequest.getSubjectName());
-        subject.setDescription(subjectRequest.getDescription());
-        // COMMENT: Save and return the created subject
-        return subjectRepo.save(subject);
-    }
-
-    @Override 
-    public List<Subject> getAllSubjects() { 
-        return subjectRepo.findAll(); 
-    }
-
-    @Override 
-    public void deleteSubject(int id) { 
-        subjectRepo.deleteById(id); 
-    }
-
-    // ==================== Exam CRUD ====================
-    @Override
-    public Exams createExam(Exams exam, int subjectId) {
-        Subject subject = subjectRepo.findById(subjectId)
-                .orElseThrow(() -> new RuntimeException("Subject not found"));
-        exam.setSubject(subject);
-        exam.setCreatedAt(LocalDateTime.now());
-        exam.setUpdatedAt(LocalDateTime.now());
-        exam.setStatus("SCHEDULED");
-        return examRepo.save(exam);
+    public Subject saveSubject(Subject subject) {
+        return subjectRepo.save(Objects.requireNonNull(subject));
     }
 
     @Override
-    public Exams createExamWithRequest(ExamRequest examRequest, Long userId) {
-        User user = userRepo.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        
-        String userRole = user.getRole().getRoleName();
-        if (!userRole.equals("ADMIN") && !userRole.equals("TEACHER")) {
-            throw new UnauthorizedException("Only Admin and Teacher can create exams");
+    public List<Subject> getAllSubjects() {
+        return subjectRepo.findAll();
+    }
+
+    @Override
+    public Subject getSubjectById(int id) {
+        return subjectRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Subject not found with id: " + id));
+    }
+
+    @Override
+    @Transactional
+    public String deleteSubject(int id, Authentication authentication) {
+        Subject subject = subjectRepo.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Subject not found with id: " + id));
+
+        User currentUser = getCurrentUser(authentication);
+        long linkedExamCount = examRepo.countBySubject_Id(id);
+        long linkedQuestionCount = questionRepo.countBySubject_Id(id);
+
+        if (hasRole(authentication, ROLE_ADMIN)) {
+            if (linkedQuestionCount > 0) {
+                questionRepo.deleteBySubject_Id(id);
+            }
+            subjectRepo.delete(subject);
+            return "Subject deleted successfully. " + linkedExamCount + " linked exam(s) and "
+                    + linkedQuestionCount + " linked question(s) were also deleted.";
         }
 
-        Subject subject = subjectRepo.findById(examRequest.getSubjectId())
-                .orElseThrow(() -> new RuntimeException("Subject not found"));
+        if (!hasRole(authentication, ROLE_TEACHER)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only ADMIN or TEACHER can delete subjects");
+        }
+
+        long teacherOwnedExamCount = examRepo.countBySubject_IdAndCreatedBy_Id(id, currentUser.getId());
+        if (linkedExamCount != teacherOwnedExamCount) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "Teachers can delete only subjects whose linked exams were created by them");
+        }
+
+        if (linkedQuestionCount > 0) {
+            questionRepo.deleteBySubject_Id(id);
+        }
+        subjectRepo.delete(subject);
+        return "Subject deleted successfully. " + linkedExamCount + " linked exam(s) and "
+                + linkedQuestionCount + " linked question(s) created under this subject were also deleted.";
+    }
+
+    // ─── Exam ────────────────────────────────────────────────────────────────
+
+    @Override
+    public ExamResponse createExam(ExamRequest request) {
+        Subject subject = subjectRepo.findById(request.getSubjectId())
+                .orElseThrow(() -> new RuntimeException("Subject not found with id: " + request.getSubjectId()));
+
+        Long createdById = Objects.requireNonNull(request.getCreatedBy(), "createdBy is required");
+        User createdBy = userRepo.findById(createdById)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + createdById));
 
         Exams exam = new Exams();
-        exam.setExamTitle(examRequest.getExamTitle());
-        exam.setExamDate(examRequest.getExamDate());
-        exam.setExamTime(examRequest.getExamTime());
-        exam.setDurationMinutes(examRequest.getDurationMinutes());
-        exam.setExamType(examRequest.getExamType());
+        exam.setExamTitle(request.getExamTitle());
+        exam.setExamDate(request.getExamDate());
+        exam.setExamTime(request.getExamTime());
+        exam.setDurationMinutes(request.getDurationMinutes());
+        exam.setExamType(request.getExamType());
+        exam.setCreatedBy(createdBy);
         exam.setSubject(subject);
-        exam.setCreatedBy(Math.toIntExact(userId));
-        exam.setCreatedAt(LocalDateTime.now());
-        exam.setUpdatedAt(LocalDateTime.now());
         exam.setStatus("SCHEDULED");
 
-        return examRepo.save(exam);
-    }
-
-    @Override 
-    public List<Exams> getAllExams() { 
-        return examRepo.findAll(); 
+        return toResponse(examRepo.save(exam));
     }
 
     @Override
-    public List<ExamResponse> getAllExamsWithResponse() {
+    public List<ExamResponse> getAllExams() {
         return examRepo.findAll().stream()
-                .map(this::convertToExamResponse)
+                .map(exam -> {
+                    updateExamStatus(exam);
+                    return toResponse(exam);
+                })
                 .collect(Collectors.toList());
     }
 
     @Override
     public ExamResponse getExamById(int id) {
         Exams exam = examRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Exam not found"));
-        return convertToExamResponse(exam);
+                .orElseThrow(() -> new RuntimeException("Exam not found with id: " + id));
+        updateExamStatus(exam);
+        return toResponse(exam);
     }
 
     @Override
-    public Exams updateExam(int id, Exams details) {
+    public ExamResponse updateExam(int id, ExamRequest request) {
         Exams existing = examRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Exam not found"));
-        existing.setExamTitle(details.getExamTitle());
-        existing.setExamDate(details.getExamDate());
-        existing.setExamTime(details.getExamTime());
-        existing.setDurationMinutes(details.getDurationMinutes());
-        existing.setExamType(details.getExamType());
-        existing.setUpdatedAt(LocalDateTime.now());
-        return examRepo.save(existing);
-    }
+                .orElseThrow(() -> new RuntimeException("Exam not found with id: " + id));
 
-    @Override
-    public Exams updateExamWithRequest(int id, ExamRequest examRequest, Long userId) {
-        User user = userRepo.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        
-        String userRole = user.getRole().getRoleName();
-        if (!userRole.equals("ADMIN") && !userRole.equals("TEACHER")) {
-            throw new UnauthorizedException("Only Admin and Teacher can update exams");
-        }
-
-        Exams existing = examRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Exam not found"));
-
-        // Check if user is the creator or an admin
-        if (existing.getCreatedBy() != userId && !userRole.equals("ADMIN")) {
-            throw new UnauthorizedException("You can only update exams you created");
-        }
-
-        existing.setExamTitle(examRequest.getExamTitle());
-        existing.setExamDate(examRequest.getExamDate());
-        existing.setExamTime(examRequest.getExamTime());
-        existing.setDurationMinutes(examRequest.getDurationMinutes());
-        existing.setExamType(examRequest.getExamType());
-        existing.setUpdatedAt(LocalDateTime.now());
-
-        if (examRequest.getSubjectId() != 0) {
-            Subject subject = subjectRepo.findById(examRequest.getSubjectId())
-                    .orElseThrow(() -> new RuntimeException("Subject not found"));
+        // Update subject only if provided
+        if (request.getSubjectId() > 0) {
+            Subject subject = subjectRepo.findById(request.getSubjectId())
+                    .orElseThrow(() -> new RuntimeException("Subject not found with id: " + request.getSubjectId()));
             existing.setSubject(subject);
         }
 
-        return examRepo.save(existing);
-    }
-
-    @Override 
-    public void deleteExam(int id) { 
-        examRepo.deleteById(id); 
-    }
-
-    // ==================== Admin Methods ====================
-    @Override
-    public List<ExamResponse> getOngoingExams() {
-        List<Exams> exams = examRepo.findAll();
-        LocalDateTime now = LocalDateTime.now();
-        return exams.stream()
-                .filter(exam -> {
-                    LocalDateTime examDateTime = LocalDateTime.of(exam.getExamDate(), exam.getExamTime());
-                    LocalDateTime examEndTime = examDateTime.plusMinutes(exam.getDurationMinutes());
-                    return now.isAfter(examDateTime) && now.isBefore(examEndTime);
-                })
-                .map(this::convertToExamResponse)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<ExamResponse> getScheduledExams() {
-        List<Exams> exams = examRepo.findAll();
-        LocalDateTime now = LocalDateTime.now();
-        return exams.stream()
-                .filter(exam -> {
-                    LocalDateTime examDateTime = LocalDateTime.of(exam.getExamDate(), exam.getExamTime());
-                    return examDateTime.isAfter(now);
-                })
-                .map(this::convertToExamResponse)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public ExamResponse getExamStatusByExamId(int examId) {
-        Exams exam = examRepo.findById(examId)
-                .orElseThrow(() -> new RuntimeException("Exam not found"));
-        return convertToExamResponse(exam);
-    }
-
-    // ==================== Student/User Methods ====================
-    @Override
-    public void registerExam(int examId, Long userId) {
-        Exams exam = examRepo.findById(examId)
-                .orElseThrow(() -> new RuntimeException("Exam not found"));
-
-        User user = userRepo.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        // Check if exam is available for registration
-        LocalDateTime examDateTime = LocalDateTime.of(exam.getExamDate(), exam.getExamTime());
-        if (LocalDateTime.now().isAfter(examDateTime)) {
-            throw new RuntimeException("Exam has already started. Cannot register now.");
+        // Update creator only if provided
+        if (request.getCreatedBy() != null && request.getCreatedBy() > 0) {
+            User createdBy = userRepo.findById(request.getCreatedBy())
+                    .orElseThrow(() -> new RuntimeException("User not found with id: " + request.getCreatedBy()));
+            existing.setCreatedBy(createdBy);
         }
 
-        // Check if already enrolled
-        if (examEnrollmentRepo.existsByExamIdAndUserId(examId, userId)) {
-            throw new RuntimeException("User is already registered for this exam");
+        // Update all other fields if provided
+        if (request.getExamTitle() != null && !request.getExamTitle().isBlank()) {
+            existing.setExamTitle(request.getExamTitle());
+        }
+        if (request.getExamDate() != null) {
+            existing.setExamDate(request.getExamDate());
+        }
+        if (request.getExamTime() != null) {
+            existing.setExamTime(request.getExamTime());
+        }
+        if (request.getDurationMinutes() > 0) {
+            existing.setDurationMinutes(request.getDurationMinutes());
+        }
+        if (request.getExamType() != null && !request.getExamType().isBlank()) {
+            existing.setExamType(request.getExamType());
         }
 
-        ExamEnrollment enrollment = new ExamEnrollment();
-        enrollment.setExamId((long) examId);
-        enrollment.setUserId(userId);
-        enrollment.setEnrolledAt(LocalDateTime.now());
-
-        examEnrollmentRepo.save(enrollment);
+        Exams saved = examRepo.save(existing);
+        updateExamStatus(saved);
+        return toResponse(saved);
     }
 
     @Override
-    public List<ExamResponse> getEnrolledExams(Long userId) {
-        List<ExamEnrollment> enrollments = examEnrollmentRepo.findByUserId(userId);
-        return enrollments.stream()
-                .map(enrollment -> {
-                    Exams exam = examRepo.findById(Math.toIntExact(enrollment.getExamId()))
-                            .orElse(null);
-                    return exam != null ? convertToExamResponse(exam) : null;
-                })
-                .filter(response -> response != null)
-                .collect(Collectors.toList());
+    public String deleteExam(int id, Authentication authentication) {
+        Exams exam = examRepo.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Exam not found with id: " + id));
+
+        if (hasRole(authentication, ROLE_ADMIN)) {
+            examRepo.delete(exam);
+            return "Exam deleted successfully by admin.";
+        }
+
+        if (!hasRole(authentication, ROLE_TEACHER)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only ADMIN or TEACHER can delete exams");
+        }
+
+        User currentUser = getCurrentUser(authentication);
+        Long examOwnerId = exam.getCreatedBy() != null ? exam.getCreatedBy().getId() : null;
+        if (!Objects.equals(examOwnerId, currentUser.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "Teachers can delete only exams created by them");
+        }
+
+        examRepo.delete(exam);
+        return "Exam deleted successfully.";
     }
 
-    @Override
-    public List<ExamResponse> getAvailableExamsForRegistration(Long userId) {
-        List<ExamEnrollment> enrollments = examEnrollmentRepo.findByUserId(userId);
-        List<Integer> enrolledExamIds = enrollments.stream()
-                .map(e -> Math.toIntExact(e.getExamId()))
-                .collect(Collectors.toList());
+    // ─── Helper ──────────────────────────────────────────────────────────────
+
+    /**
+     * Updates exam status based on current time and persists to database
+     */
+    private void updateExamStatus(Exams exam) {
+        if (exam == null || exam.getExamDate() == null || exam.getExamTime() == null || exam.getDurationMinutes() <= 0) {
+            exam.setStatus("SCHEDULED");
+            examRepo.save(exam);
+            return;
+        }
 
         LocalDateTime now = LocalDateTime.now();
-        return examRepo.findAll().stream()
-                .filter(exam -> {
-                    LocalDateTime examDateTime = LocalDateTime.of(exam.getExamDate(), exam.getExamTime());
-                    return !enrolledExamIds.contains(exam.getId()) 
-                           && examDateTime.isAfter(now);
-                })
-                .map(this::convertToExamResponse)
-                .collect(Collectors.toList());
+        LocalDateTime examStart = LocalDateTime.of(exam.getExamDate(), exam.getExamTime());
+        LocalDateTime examEnd = examStart.plusMinutes(exam.getDurationMinutes());
+
+        String newStatus;
+        if (now.isBefore(examStart)) {
+            newStatus = "SCHEDULED";
+        } else if (now.isAfter(examEnd)) {
+            newStatus = "COMPLETED";
+        } else {
+            newStatus = "ONGOING";
+        }
+
+        if (!newStatus.equals(exam.getStatus())) {
+            exam.setStatus(newStatus);
+            examRepo.save(exam);
+        }
     }
 
-    @Override
-    public boolean canAttemptExam(int examId, Long userId) {
-        Exams exam = examRepo.findById(examId)
-                .orElseThrow(() -> new RuntimeException("Exam not found"));
+    private ExamResponse toResponse(Exams exam) {
+        ExamResponse r = new ExamResponse();
+        r.setId(exam.getId());
+        r.setExamTitle(exam.getExamTitle());
+        r.setExamDate(exam.getExamDate() != null ? exam.getExamDate().toString() : null);
+        r.setExamTime(exam.getExamTime() != null ? exam.getExamTime().toString() : null);
+        r.setDurationMinutes(exam.getDurationMinutes());
+        r.setExamType(exam.getExamType());
+        r.setCreatedBy(exam.getCreatedBy() != null ? exam.getCreatedBy().getId() : null);
+        r.setStatus(exam.getStatus());
+        if (exam.getSubject() != null) {
+            r.setSubjectId(exam.getSubject().getId());
+            r.setSubjectName(exam.getSubject().getSubjectName());
+        }
+        return r;
+    }
 
-        // Check if user is enrolled
-        if (!examEnrollmentRepo.existsByExamIdAndUserId(examId, userId)) {
+    private User getCurrentUser(Authentication authentication) {
+        if (authentication == null || authentication.getName() == null || authentication.getName().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authentication required");
+        }
+
+        return userRepo.findByEmail(authentication.getName())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authenticated user not found"));
+    }
+
+    private boolean hasRole(Authentication authentication, String role) {
+        if (authentication == null || authentication.getAuthorities() == null) {
             return false;
         }
-
-        // Check if exam is currently happening
-        LocalDateTime examDateTime = LocalDateTime.of(exam.getExamDate(), exam.getExamTime());
-        LocalDateTime examEndTime = examDateTime.plusMinutes(exam.getDurationMinutes());
-        LocalDateTime now = LocalDateTime.now();
-
-        return now.isAfter(examDateTime) && now.isBefore(examEndTime);
-    }
-
-    // ==================== Utility Methods ====================
-    @Override
-    public String getExamStatus(int examId) {
-        Exams exam = examRepo.findById(examId)
-                .orElseThrow(() -> new RuntimeException("Exam not found"));
-        return exam.getStatus();
-    }
-
-    @Override
-    public void updateExamStatus(int examId, String status) {
-        Exams exam = examRepo.findById(examId)
-                .orElseThrow(() -> new RuntimeException("Exam not found"));
-        exam.setStatus(status);
-        exam.setUpdatedAt(LocalDateTime.now());
-        examRepo.save(exam);
-    }
-
-    // ==================== Helper Methods ====================
-    private ExamResponse convertToExamResponse(Exams exam) {
-        ExamResponse response = new ExamResponse();
-        response.setId(exam.getId());
-        response.setExamTitle(exam.getExamTitle());
-        response.setExamDate(exam.getExamDate().toString());
-        response.setExamTime(exam.getExamTime().toString());
-        response.setDurationMinutes(exam.getDurationMinutes());
-        response.setSubjectId(exam.getSubject().getId());
-        response.setSubjectName(exam.getSubject().getSubjectName());
-        response.setExamType(exam.getExamType());
-        response.setCreatedBy(exam.getCreatedBy());
-        response.setStatus(exam.getStatus());
-        return response;
+        return authentication.getAuthorities().stream()
+                .anyMatch(a -> role.equals(a.getAuthority().toUpperCase(Locale.ROOT)));
     }
 }
