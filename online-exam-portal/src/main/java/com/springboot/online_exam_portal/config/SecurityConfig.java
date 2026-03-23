@@ -40,7 +40,7 @@ public class SecurityConfig {
                 //  Disable CSRF (for APIs)
                 .csrf(csrf -> csrf.disable())
 
-                //  No session (JWT)
+                // git No session (JWT)
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
@@ -50,6 +50,7 @@ public class SecurityConfig {
 
                         // PUBLIC APIs
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/error").permitAll()
 
                         // SELF-SERVICE (authenticated users)
                         .requestMatchers(HttpMethod.GET, "/api/users/profile").authenticated()

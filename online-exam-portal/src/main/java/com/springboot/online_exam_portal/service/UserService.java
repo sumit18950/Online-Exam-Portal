@@ -65,10 +65,10 @@ public class UserService {
 
         User user = userRepository
                 .findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
 
         if(!passwordEncoder.matches(password,user.getPasswordHash())){
-            throw new RuntimeException("Invalid password");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid password");
         }
 
         return user;
