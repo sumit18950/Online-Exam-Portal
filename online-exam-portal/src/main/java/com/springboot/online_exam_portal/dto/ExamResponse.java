@@ -16,7 +16,7 @@ public class ExamResponse {
     private int subjectId;
     private String subjectName;
     private String examType;
-    private int createdBy;
+    private Long createdBy;
     private String status; // "SCHEDULED", "ONGOING", "COMPLETED"
 }
 

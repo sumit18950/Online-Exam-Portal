@@ -15,6 +15,8 @@ public class ExamRequest {
     private LocalTime examTime;
     private int durationMinutes;
     private int subjectId;
+    private Long createdBy;
     private String examType; // e.g., "MULTIPLE_CHOICE", "DESCRIPTIVE", "MIXED"
+    private String status; // "SCHEDULED", "ONGOING", "COMPLETED"
 }
 

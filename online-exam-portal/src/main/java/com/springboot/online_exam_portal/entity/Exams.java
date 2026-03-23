@@ -23,7 +23,15 @@ public class Exams {
     private LocalDate examDate;
     private LocalTime examTime;
     private int durationMinutes;
-    private int createdBy;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "created_by", nullable = false)
+    @JsonIgnore
+    private User createdBy;
+
+    private String examType;   // MULTIPLE_CHOICE, DESCRIPTIVE, MIXED
+
+    private String status = "SCHEDULED"; // SCHEDULED, ONGOING, COMPLETED
 
     @Column(updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
@@ -32,4 +40,29 @@ public class Exams {
     @JoinColumn(name = "subject_id", nullable = false)
     @JsonIgnore
     private Subject subject;
+
+    /**
+     * Automatically calculates and updates exam status based on current date/time
+     * Called before persist and before update operations
+     */
+    @PrePersist
+    @PreUpdate
+    public void calculateStatus() {
+        if (this.examDate == null || this.examTime == null || this.durationMinutes <= 0) {
+            this.status = "SCHEDULED";
+            return;
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime examStart = LocalDateTime.of(this.examDate, this.examTime);
+        LocalDateTime examEnd = examStart.plusMinutes(this.durationMinutes);
+
+        if (now.isBefore(examStart)) {
+            this.status = "SCHEDULED";
+        } else if (now.isAfter(examEnd)) {
+            this.status = "COMPLETED";
+        } else {
+            this.status = "ONGOING";
+        }
+    }
 }

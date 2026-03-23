@@ -50,6 +50,14 @@ public class SecurityConfig {
 
                         // PUBLIC APIs
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/exams/**").permitAll()
+                        .requestMatchers("/api/management/**").permitAll()
+
+                        // EXAMS + SUBJECTS WRITE ACCESS (ADMIN/TEACHER)
+                        .requestMatchers(HttpMethod.POST, "/api/exams/attempt").hasRole("STUDENT")
+                        .requestMatchers(HttpMethod.POST, "/api/exams/**").hasAnyRole("ADMIN", "TEACHER")
+                        .requestMatchers(HttpMethod.PUT, "/api/exams/**").hasAnyRole("ADMIN", "TEACHER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/exams/**").hasAnyRole("ADMIN", "TEACHER")
 
                         // SELF-SERVICE (authenticated users)
                         .requestMatchers(HttpMethod.GET, "/api/users/profile").authenticated()
@@ -66,7 +74,6 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/users/by-id/{id}").hasAnyRole("ADMIN", "TEACHER")
 
                         .requestMatchers("/api/questions/**").hasAnyRole("ADMIN", "TEACHER")
-                        .requestMatchers(HttpMethod.POST, "/api/exams/attempt").hasRole("STUDENT")
 
                         // ALL other APIs require login
                         .anyRequest().authenticated()
