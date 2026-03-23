@@ -26,38 +26,31 @@ public class SecurityConfig {
         this.jwtFilter = jwtFilter;
     }
 
-    // ✅ Password Encoder
+    // Password Encoder
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // ✅ Security Configuration
+    // Security Configuration
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-                // ❌ Disable CSRF (for APIs)
+                //  Disable CSRF (for APIs)
                 .csrf(csrf -> csrf.disable())
 
-                // ❌ No session (JWT)
+                // git No session (JWT)
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
 
-                // ✅ Authorization rules
+                //  Authorization rules
                 .authorizeHttpRequests(auth -> auth
 
                         // PUBLIC APIs
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/exams/**").permitAll()
-                        .requestMatchers("/api/management/**").permitAll()
-
-                        // EXAMS + SUBJECTS WRITE ACCESS (ADMIN/TEACHER)
-                        .requestMatchers(HttpMethod.POST, "/api/exams/attempt").hasRole("STUDENT")
-                        .requestMatchers(HttpMethod.POST, "/api/exams/**").hasAnyRole("ADMIN", "TEACHER")
-                        .requestMatchers(HttpMethod.PUT, "/api/exams/**").hasAnyRole("ADMIN", "TEACHER")
-                        .requestMatchers(HttpMethod.DELETE, "/api/exams/**").hasAnyRole("ADMIN", "TEACHER")
+                        .requestMatchers("/error").permitAll()
 
                         // SELF-SERVICE (authenticated users)
                         .requestMatchers(HttpMethod.GET, "/api/users/profile").authenticated()
@@ -74,12 +67,13 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/users/by-id/{id}").hasAnyRole("ADMIN", "TEACHER")
 
                         .requestMatchers("/api/questions/**").hasAnyRole("ADMIN", "TEACHER")
+                        .requestMatchers(HttpMethod.POST, "/api/exams/attempt").hasRole("STUDENT")
 
                         // ALL other APIs require login
                         .anyRequest().authenticated()
                 )
 
-                // ✅ Add JWT filter before UsernamePasswordAuthenticationFilter
+                //  Add JWT filter before UsernamePasswordAuthenticationFilter
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
