@@ -34,7 +34,7 @@ public class UserController {
         this.passwordEncoder = passwordEncoder;
     }
 
-    // ✅ 1. GET PROFILE
+    //  1. GET PROFILE
     @GetMapping("/profile")
     public User getProfile(Authentication authentication){
         String email = authentication.getName();
@@ -42,7 +42,7 @@ public class UserController {
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
-    // ✅ 2. UPDATE PROFILE
+    //  2. UPDATE PROFILE
     @PutMapping("/update-profile")
     public User updateProfile(@RequestBody UpdateProfileRequest request,
                               Authentication authentication){
@@ -56,7 +56,7 @@ public class UserController {
         return userRepository.save(user);
     }
 
-    // ✅ 3. CHANGE PASSWORD
+    //  3. CHANGE PASSWORD
     @PostMapping("/change-password")
     public String changePassword(@RequestBody ChangePasswordRequest request,
                                  Authentication authentication){
@@ -75,13 +75,13 @@ public class UserController {
         return "Password updated successfully";
     }
 
-    // ✅ 4. GET ALL USERS (ADMIN)
+    // 4. GET ALL USERS (ADMIN)
     @GetMapping("/all")
     public List<User> getAllUsers(){
         return userRepository.findAll();
     }
 
-    // ✅ 5. GET USER BY ID (ADMIN, or TEACHER for STUDENT users only)
+    // 5. GET USER BY ID (ADMIN, or TEACHER for STUDENT users only)
     @GetMapping("/{id}")
     public User getUserById(@PathVariable Long id, Authentication authentication) {
         User user = userRepository.findById(id)
@@ -116,7 +116,7 @@ public class UserController {
         return getUserById(id, authentication);
     }
 
-    // ✅ 6. UPDATE USER (ADMIN)
+    //  6. UPDATE USER (ADMIN)
     @PutMapping("/{id}")
     public User updateUser(@PathVariable Long id,
                            @RequestBody AdminUpdateUserRequest request) {
@@ -141,7 +141,7 @@ public class UserController {
         return userRepository.save(user);
     }
 
-    // ✅ 7. DELETE USER (ADMIN)
+    //  7. DELETE USER (ADMIN)
     @DeleteMapping("/{id}")
     public String deleteUser(@PathVariable Long id){
 

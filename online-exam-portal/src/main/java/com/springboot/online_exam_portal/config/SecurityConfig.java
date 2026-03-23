@@ -26,13 +26,13 @@ public class SecurityConfig {
         this.jwtFilter = jwtFilter;
     }
 
-    // ✅ Password Encoder
+    // Password Encoder
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // ✅ Security Configuration
+    // Security Configuration
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
@@ -45,7 +45,7 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
 
-                // ✅ Authorization rules
+                //  Authorization rules
                 .authorizeHttpRequests(auth -> auth
 
                         // PUBLIC APIs
@@ -72,7 +72,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
 
-                // ✅ Add JWT filter before UsernamePasswordAuthenticationFilter
+                //  Add JWT filter before UsernamePasswordAuthenticationFilter
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
