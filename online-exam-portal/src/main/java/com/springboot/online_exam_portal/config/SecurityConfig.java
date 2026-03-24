@@ -59,7 +59,7 @@ public class SecurityConfig {
 
                         // ADMIN ONLY
                         .requestMatchers(HttpMethod.GET, "/api/users/all").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/users/{id}").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/users/{id}").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/users/{id}").hasRole("ADMIN")
 
                         // ADMIN + TEACHER (teacher access is constrained in controller to STUDENT users only)
