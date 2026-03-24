@@ -48,6 +48,7 @@ Content-Type: application/json
 | PUT | `/api/users/update-profile` | Any authenticated user | Update own profile (username) |
 | POST | `/api/users/change-password` | Any authenticated user | Change own password |
 | GET | `/api/users/all` | ADMIN only | Get all users |
+| GET | `/api/users/students` | TEACHER only | Get all student profiles |
 | GET | `/api/users/{id}` | ADMIN or TEACHER | Get user by id (TEACHER limited in controller) |
 | GET | `/api/users/by-id/{id}` | ADMIN or TEACHER | Legacy route of get-by-id |
 | PUT | `/api/users/{id}` | Any authenticated user (controller enforces admin-or-self) | Update user |
@@ -148,6 +149,8 @@ Content-Type: application/json
    - Non-admin cannot `PUT /api/users/{otherUserId}`.
    - Logged-in user can `PUT /api/users/{selfId}`.
    - Non-admin cannot change role in `PUT /api/users/{selfId}`.
+   - TEACHER can access `GET /api/users/students` and sees only STUDENT users.
+   - ADMIN/STUDENT are denied for `GET /api/users/students`.
 
 ---
 
@@ -170,4 +173,3 @@ curl -X PUT "http://localhost:9090/api/users/5" \
   -H "Content-Type: application/json" \
   -d '{"username":"new-name"}'
 ```
-

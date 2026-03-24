@@ -62,6 +62,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/users/{id}").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/users/{id}").hasRole("ADMIN")
 
+                        // TEACHER ONLY
+                        .requestMatchers(HttpMethod.GET, "/api/users/students").hasRole("TEACHER")
+
                         // ADMIN + TEACHER (teacher access is constrained in controller to STUDENT users only)
                         .requestMatchers(HttpMethod.GET, "/api/users/{id}").hasAnyRole("ADMIN", "TEACHER")
                         .requestMatchers(HttpMethod.GET, "/api/users/by-id/{id}").hasAnyRole("ADMIN", "TEACHER")
