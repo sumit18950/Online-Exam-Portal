@@ -3,6 +3,7 @@ package com.springboot.online_exam_portal.controller;
 import com.springboot.online_exam_portal.dto.ExamRequest;
 import com.springboot.online_exam_portal.dto.ExamResponse;
 import com.springboot.online_exam_portal.dto.SubjectRequest;
+import com.springboot.online_exam_portal.dto.SubjectResponse;
 import com.springboot.online_exam_portal.entity.Subject;
 import com.springboot.online_exam_portal.entity.User;
 import com.springboot.online_exam_portal.repository.UserRepository;
@@ -35,46 +36,50 @@ public class ExamController {
 
     // GET /api/exams/subjects        ╬ô├Ñ├å list all subjects
     @GetMapping("/subjects")
-    public ResponseEntity<List<Subject>> listSubjects() {
-        return ResponseEntity.ok(service.getAllSubjects());
+    public ResponseEntity<List<SubjectResponse>> listSubjects() {
+        List<SubjectResponse> subjects = service.getAllSubjects().stream()
+                .map(this::toSubjectResponse)
+                .toList();
+        return ResponseEntity.ok(subjects);
     }
 
     // GET /api/exams/subjects/{id}   ╬ô├Ñ├å get one subject by id
     @GetMapping("/subjects/{id}")
-    public ResponseEntity<Subject> getSubject(@PathVariable int id) {
-        return ResponseEntity.ok(service.getSubjectById(id));
+    public ResponseEntity<SubjectResponse> getSubject(@PathVariable int id) {
+        return ResponseEntity.ok(toSubjectResponse(service.getSubjectById(id)));
     }
 
     // POST /api/exams/subjects       ╬ô├Ñ├å add a new subject
     @PostMapping("/subjects")
-    public ResponseEntity<Subject> addSubject(@RequestBody SubjectRequest request,
-                                              @RequestHeader(value = "userId", required = false) Long userId,
-                                              Authentication authentication) {
+    public ResponseEntity<SubjectResponse> addSubject(@RequestBody SubjectRequest request,
+                                                      @RequestHeader(value = "userId", required = false) Long userId,
+                                                      Authentication authentication) {
         User actor = resolveCurrentUser(authentication, userId);
         enforceAdminOrTeacher(actor);
-        return ResponseEntity.status(HttpStatus.CREATED).body(service.saveSubject(request));
+        Subject saved = service.saveSubject(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(toSubjectResponse(saved));
     }
 
     // PUT /api/exams/subjects/{id}   ╬ô├Ñ├å update a subject (full update)
     @PutMapping("/subjects/{id}")
-    public ResponseEntity<Subject> updateSubject(@PathVariable int id,
-                                                 @RequestBody SubjectRequest request,
-                                                 @RequestHeader(value = "userId", required = false) Long userId,
-                                                 Authentication authentication) {
+    public ResponseEntity<SubjectResponse> updateSubject(@PathVariable int id,
+                                                         @RequestBody SubjectRequest request,
+                                                         @RequestHeader(value = "userId", required = false) Long userId,
+                                                         Authentication authentication) {
         User actor = resolveCurrentUser(authentication, userId);
         enforceAdminOrTeacher(actor);
-        return ResponseEntity.ok(service.updateSubject(id, request));
+        return ResponseEntity.ok(toSubjectResponse(service.updateSubject(id, request)));
     }
 
     // PATCH /api/exams/subjects/{id} ╬ô├Ñ├å partial update a subject
     @PatchMapping("/subjects/{id}")
-    public ResponseEntity<Subject> patchSubject(@PathVariable int id,
-                                                @RequestBody SubjectRequest request,
-                                                @RequestHeader(value = "userId", required = false) Long userId,
-                                                Authentication authentication) {
+    public ResponseEntity<SubjectResponse> patchSubject(@PathVariable int id,
+                                                        @RequestBody SubjectRequest request,
+                                                        @RequestHeader(value = "userId", required = false) Long userId,
+                                                        Authentication authentication) {
         User actor = resolveCurrentUser(authentication, userId);
         enforceAdminOrTeacher(actor);
-        return ResponseEntity.ok(service.updateSubject(id, request));
+        return ResponseEntity.ok(toSubjectResponse(service.updateSubject(id, request)));
     }
 
     // DELETE /api/exams/subjects/{id} ╬ô├Ñ├å delete subject (cascades to its exams)
@@ -263,5 +268,9 @@ public class ExamController {
         }
         String role = user.getRole().getRoleName().trim().toUpperCase(Locale.ROOT);
         return role.startsWith("ROLE_") ? role.substring(5) : role;
+    }
+
+    private SubjectResponse toSubjectResponse(Subject subject) {
+        return new SubjectResponse(subject.getId(), subject.getSubjectName(), subject.getDescription());
     }
 }

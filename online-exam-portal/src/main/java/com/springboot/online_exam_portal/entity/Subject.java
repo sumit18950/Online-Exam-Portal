@@ -1,6 +1,6 @@
 package com.springboot.online_exam_portal.entity;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,10 +23,8 @@ public class Subject {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    // COMMENT: @JsonManagedReference = "parent" side. Exams list IS included in JSON output.
-    // The "child" side (@JsonBackReference on Exams.subject) is automatically excluded
-    // to prevent infinite loop: Subject→Exams→Subject→Exams→...
-    @JsonManagedReference
+    // Prevent lazy-loading serialization issues for subject responses.
+    @JsonIgnore
     @OneToMany(mappedBy = "subject", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Exams> exams;
 }
