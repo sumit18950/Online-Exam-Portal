@@ -94,6 +94,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/users/by-id/{id}").hasAnyRole("ADMIN", "TEACHER")
 
                         .requestMatchers("/api/questions/**").hasAnyRole("ADMIN", "TEACHER")
+                        .requestMatchers("/api/options/**").hasAnyRole("ADMIN", "TEACHER")
 
                         // Exam APIs: allow through security filter; role checks are handled in ExamController
                         .requestMatchers("/api/exams/**").permitAll()

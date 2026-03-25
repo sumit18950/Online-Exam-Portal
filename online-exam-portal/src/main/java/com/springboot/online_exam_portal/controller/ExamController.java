@@ -2,6 +2,7 @@ package com.springboot.online_exam_portal.controller;
 
 import com.springboot.online_exam_portal.dto.ExamRequest;
 import com.springboot.online_exam_portal.dto.ExamResponse;
+import com.springboot.online_exam_portal.dto.SubjectRequest;
 import com.springboot.online_exam_portal.entity.Subject;
 import com.springboot.online_exam_portal.entity.User;
 import com.springboot.online_exam_portal.repository.UserRepository;
@@ -46,8 +47,34 @@ public class ExamController {
 
     // POST /api/exams/subjects       → add a new subject
     @PostMapping("/subjects")
-    public ResponseEntity<Subject> addSubject(@RequestBody Subject s) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(service.saveSubject(s));
+    public ResponseEntity<Subject> addSubject(@RequestBody SubjectRequest request,
+                                              @RequestHeader(value = "userId", required = false) Long userId,
+                                              Authentication authentication) {
+        User actor = resolveCurrentUser(authentication, userId);
+        enforceAdminOrTeacher(actor);
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.saveSubject(request));
+    }
+
+    // PUT /api/exams/subjects/{id}   → update a subject (full update)
+    @PutMapping("/subjects/{id}")
+    public ResponseEntity<Subject> updateSubject(@PathVariable int id,
+                                                 @RequestBody SubjectRequest request,
+                                                 @RequestHeader(value = "userId", required = false) Long userId,
+                                                 Authentication authentication) {
+        User actor = resolveCurrentUser(authentication, userId);
+        enforceAdminOrTeacher(actor);
+        return ResponseEntity.ok(service.updateSubject(id, request));
+    }
+
+    // PATCH /api/exams/subjects/{id} → partial update a subject
+    @PatchMapping("/subjects/{id}")
+    public ResponseEntity<Subject> patchSubject(@PathVariable int id,
+                                                @RequestBody SubjectRequest request,
+                                                @RequestHeader(value = "userId", required = false) Long userId,
+                                                Authentication authentication) {
+        User actor = resolveCurrentUser(authentication, userId);
+        enforceAdminOrTeacher(actor);
+        return ResponseEntity.ok(service.updateSubject(id, request));
     }
 
     // DELETE /api/exams/subjects/{id} → delete subject (cascades to its exams)
@@ -114,6 +141,18 @@ public class ExamController {
         return ResponseEntity.ok(service.updateExam(id, request));
     }
 
+    // PATCH /api/exams/{id}          → partial update an existing exam
+    @PatchMapping("/{id}")
+    public ResponseEntity<ExamResponse> patchExam(@PathVariable int id,
+                                                   @RequestBody ExamRequest request,
+                                                   @RequestHeader(value = "userId", required = false) Long userId,
+                                                   Authentication authentication) {
+        User actor = resolveCurrentUser(authentication, userId);
+        enforceAdminOrTeacher(actor);
+        request.setCreatedBy(null);
+        return ResponseEntity.ok(service.updateExam(id, request));
+    }
+
     // PUT /api/exams/admin/update/{id}   → compatibility route for documented admin API
     @PutMapping("/admin/update/{id}")
     public ResponseEntity<ExamResponse> updateExamAdmin(@PathVariable int id,
@@ -123,12 +162,30 @@ public class ExamController {
         return updateExam(id, request, userId, authentication);
     }
 
+    // PATCH /api/exams/admin/update/{id} → compatibility route for documented admin API
+    @PatchMapping("/admin/update/{id}")
+    public ResponseEntity<ExamResponse> patchExamAdmin(@PathVariable int id,
+                                                       @RequestBody ExamRequest request,
+                                                       @RequestHeader(value = "userId", required = false) Long userId,
+                                                       Authentication authentication) {
+        return updateExam(id, request, userId, authentication);
+    }
+
     // PUT /api/exams/teacher/update/{id} → compatibility route for documented teacher API
     @PutMapping("/teacher/update/{id}")
     public ResponseEntity<ExamResponse> updateExamTeacher(@PathVariable int id,
                                                           @RequestBody ExamRequest request,
                                                           @RequestHeader(value = "userId", required = false) Long userId,
                                                           Authentication authentication) {
+        return updateExam(id, request, userId, authentication);
+    }
+
+    // PATCH /api/exams/teacher/update/{id} → compatibility route for documented teacher API
+    @PatchMapping("/teacher/update/{id}")
+    public ResponseEntity<ExamResponse> patchExamTeacher(@PathVariable int id,
+                                                         @RequestBody ExamRequest request,
+                                                         @RequestHeader(value = "userId", required = false) Long userId,
+                                                         Authentication authentication) {
         return updateExam(id, request, userId, authentication);
     }
 
