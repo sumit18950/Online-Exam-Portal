@@ -61,6 +61,11 @@ public class ExamServiceImpl implements ExamService {
         }
         Subject saved = subjectRepo.save(existing);
         subjectRepo.flush();
+        
+        // Cascade update: notify all linked exams about subject change
+        // (In a real system, you might emit an event or update a denormalized field)
+        // For now, the relationship is maintained through the foreign key
+        
         return saved;
     }
 

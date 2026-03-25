@@ -96,8 +96,19 @@ public class SecurityConfig {
                         .requestMatchers("/api/questions/**").hasAnyRole("ADMIN", "TEACHER")
                         .requestMatchers("/api/options/**").hasAnyRole("ADMIN", "TEACHER")
 
-                        // Exam APIs: allow through security filter; role checks are handled in ExamController
-                        .requestMatchers("/api/exams/**").permitAll()
+                        // Exam & Subject APIs: Protected - requires authentication, detailed role checks in controller
+                        .requestMatchers("/api/exams/subjects").hasAnyRole("ADMIN", "TEACHER")
+                        .requestMatchers(HttpMethod.POST, "/api/exams/subjects").hasAnyRole("ADMIN", "TEACHER")
+                        .requestMatchers(HttpMethod.PUT, "/api/exams/subjects/**").hasAnyRole("ADMIN", "TEACHER")
+                        .requestMatchers(HttpMethod.PATCH, "/api/exams/subjects/**").hasAnyRole("ADMIN", "TEACHER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/exams/subjects/**").hasAnyRole("ADMIN", "TEACHER")
+                        .requestMatchers(HttpMethod.POST, "/api/exams").hasAnyRole("ADMIN", "TEACHER")
+                        .requestMatchers(HttpMethod.POST, "/api/exams/admin/create").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/exams/teacher/create").hasRole("TEACHER")
+                        .requestMatchers(HttpMethod.PUT, "/api/exams/**").hasAnyRole("ADMIN", "TEACHER")
+                        .requestMatchers(HttpMethod.PATCH, "/api/exams/**").hasAnyRole("ADMIN", "TEACHER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/exams/**").hasAnyRole("ADMIN", "TEACHER")
+                        .requestMatchers(HttpMethod.GET, "/api/exams/**").authenticated()
 
                         // ALL other APIs require login
                         .anyRequest().authenticated()
