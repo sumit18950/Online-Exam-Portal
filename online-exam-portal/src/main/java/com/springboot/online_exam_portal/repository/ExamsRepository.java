@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ExamsRepository extends JpaRepository<Exams, Integer> {
 	long countBySubject_Id(int subjectId);
-	long countBySubject_IdAndCreatedBy_Id(int subjectId, Long createdById);
+	long countBySubject_IdAndCreatedBy(int subjectId, int createdBy);
 }

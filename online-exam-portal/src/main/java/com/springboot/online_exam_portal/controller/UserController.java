@@ -81,6 +81,11 @@ public class UserController {
         return userRepository.findAll();
     }
 
+    // 4.1 GET ALL STUDENT PROFILES (TEACHER)
+    @GetMapping("/students")
+    public List<User> getAllStudentProfiles() {
+        return userRepository.findByRole_RoleNameIgnoreCase(ROLE_STUDENT);
+    }
     // 5. GET USER BY ID (ADMIN, or TEACHER for STUDENT users only)
     @GetMapping("/{id}")
     public User getUserById(@PathVariable Long id, Authentication authentication) {
@@ -116,29 +121,44 @@ public class UserController {
         return getUserById(id, authentication);
     }
 
-    //  6. UPDATE USER (ADMIN)
+    //  6. UPDATE USER (ADMIN or SELF)
     @PutMapping("/{id}")
     public User updateUser(@PathVariable Long id,
-                           @RequestBody AdminUpdateUserRequest request) {
+                           @RequestBody AdminUpdateUserRequest request,
+                           Authentication authentication) {
 
-        User user = userRepository.findById(id)
+        User targetUser = userRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
+        User currentUser = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authenticated user not found"));
+
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(a -> ROLE_ADMIN.equals(a.getAuthority()));
+
+        boolean isSelf = currentUser.getId() != null && currentUser.getId().equals(targetUser.getId());
+        if (!isAdmin && !isSelf) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can update only your own profile");
+        }
+
         if (request.getUsername() != null && !request.getUsername().isBlank()) {
-            user.setUsername(request.getUsername());
+            targetUser.setUsername(request.getUsername());
         }
 
         if (request.getEmail() != null && !request.getEmail().isBlank()) {
-            user.setEmail(request.getEmail());
+            targetUser.setEmail(request.getEmail());
         }
 
         if (request.getRole() != null && !request.getRole().isBlank()) {
+            if (!isAdmin) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only admin can change roles");
+            }
             Role role = roleRepository.findByRoleName(request.getRole())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid role"));
-            user.setRole(role);
+            targetUser.setRole(role);
         }
 
-        return userRepository.save(user);
+        return userRepository.save(targetUser);
     }
 
     //  7. DELETE USER (ADMIN)

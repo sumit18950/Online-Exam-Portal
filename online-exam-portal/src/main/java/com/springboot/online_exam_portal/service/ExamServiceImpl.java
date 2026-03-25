@@ -34,7 +34,7 @@ public class ExamServiceImpl implements ExamService {
     @Autowired private QuestionRepository questionRepo;
     @Autowired private UserRepository userRepo;
 
-    // ─── Subject ────────────────────────────────────────────────────────────
+    // ΓöÇΓöÇΓöÇ Subject ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
     @Override
     public Subject saveSubject(SubjectRequest request) {
@@ -103,7 +103,7 @@ public class ExamServiceImpl implements ExamService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only ADMIN or TEACHER can delete subjects");
         }
 
-        long teacherOwnedExamCount = examRepo.countBySubject_IdAndCreatedBy_Id(id, currentUser.getId());
+        long teacherOwnedExamCount = examRepo.countBySubject_IdAndCreatedBy(id, currentUser.getId().intValue());
         if (linkedExamCount != teacherOwnedExamCount) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,
                     "Teachers can delete only subjects whose linked exams were created by them");
@@ -117,7 +117,7 @@ public class ExamServiceImpl implements ExamService {
                 + linkedQuestionCount + " linked question(s) created under this subject were also deleted.";
     }
 
-    // ─── Exam ────────────────────────────────────────────────────────────────
+    // ΓöÇΓöÇΓöÇ Exam ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
     @Override
     public ExamResponse createExam(ExamRequest request) {
@@ -134,7 +134,7 @@ public class ExamServiceImpl implements ExamService {
         exam.setExamTime(request.getExamTime());
         exam.setDurationMinutes(request.getDurationMinutes());
         exam.setExamType(request.getExamType());
-        exam.setCreatedBy(createdBy);
+        exam.setCreatedBy(createdBy.getId().intValue());
         exam.setSubject(subject);
         exam.setStatus("SCHEDULED");
 
@@ -175,7 +175,7 @@ public class ExamServiceImpl implements ExamService {
         if (request.getCreatedBy() != null && request.getCreatedBy() > 0) {
             User createdBy = userRepo.findById(request.getCreatedBy())
                     .orElseThrow(() -> new RuntimeException("User not found with id: " + request.getCreatedBy()));
-            existing.setCreatedBy(createdBy);
+            existing.setCreatedBy(createdBy.getId().intValue());
         }
 
         // Update all other fields if provided
@@ -215,8 +215,8 @@ public class ExamServiceImpl implements ExamService {
         }
 
         User currentUser = getCurrentUser(authentication);
-        Long examOwnerId = exam.getCreatedBy() != null ? exam.getCreatedBy().getId() : null;
-        if (!Objects.equals(examOwnerId, currentUser.getId())) {
+        Integer examOwnerId = exam.getCreatedBy();
+        if (examOwnerId == null || examOwnerId.intValue() != currentUser.getId().intValue()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,
                     "Teachers can delete only exams created by them");
         }
@@ -225,7 +225,7 @@ public class ExamServiceImpl implements ExamService {
         return "Exam deleted successfully.";
     }
 
-    // ─── Helper ──────────────────────────────────────────────────────────────
+    // ΓöÇΓöÇΓöÇ Helper ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
     /**
      * Updates exam status based on current time and persists to database
@@ -264,7 +264,7 @@ public class ExamServiceImpl implements ExamService {
         r.setExamTime(exam.getExamTime() != null ? exam.getExamTime().toString() : null);
         r.setDurationMinutes(exam.getDurationMinutes());
         r.setExamType(exam.getExamType());
-        r.setCreatedBy(exam.getCreatedBy() != null ? exam.getCreatedBy().getId() : null);
+        r.setCreatedBy(Long.valueOf(exam.getCreatedBy()));
         r.setStatus(exam.getStatus());
         if (exam.getSubject() != null) {
             r.setSubjectId(exam.getSubject().getId());
