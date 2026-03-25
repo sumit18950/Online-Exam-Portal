@@ -1,6 +1,6 @@
 package com.springboot.online_exam_portal.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,12 +24,22 @@ public class Exams {
     private LocalTime examTime;
     private int durationMinutes;
     private int createdBy;
+    
+    private String examType; // MULTIPLE_CHOICE, DESCRIPTIVE, MIXED
 
     @Column(updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
+    
+    private LocalDateTime updatedAt;
+    
+    private String status; // SCHEDULED, ONGOING, COMPLETED
 
+    // COMMENT: @JsonBackReference = "child" side of the relationship.
+    // When Exams is serialized, the "subject" field is SKIPPED to prevent
+    // the circular loop: Subject→Exams→Subject→Exams→...
+    // Subject details are included via ExamResponse DTO (subjectId, subjectName).
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "subject_id", nullable = false)
-    @JsonIgnore
     private Subject subject;
 }

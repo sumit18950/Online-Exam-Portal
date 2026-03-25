@@ -1,18 +1,25 @@
 package com.springboot.online_exam_portal.service;
 
-import com.springboot.online_exam_portal.entity.Exams;
+import com.springboot.online_exam_portal.dto.ExamRequest;
+import com.springboot.online_exam_portal.dto.ExamResponse;
+import com.springboot.online_exam_portal.dto.SubjectRequest;
 import com.springboot.online_exam_portal.entity.Subject;
+import org.springframework.security.core.Authentication;
+
 import java.util.List;
 
 public interface ExamService {
     // Subject CRUD
-    Subject saveSubject(Subject subject);
+    Subject saveSubject(SubjectRequest request);
+    Subject updateSubject(int id, SubjectRequest request);
     List<Subject> getAllSubjects();
-    void deleteSubject(int id);
+    Subject getSubjectById(int id);
+    String deleteSubject(int id, Authentication authentication);
 
     // Exam CRUD
-    Exams createExam(Exams exam, int subjectId);
-    List<Exams> getAllExams();
-    Exams updateExam(int id, Exams examDetails);
-    void deleteExam(int id);
+    ExamResponse createExam(ExamRequest request);
+    List<ExamResponse> getAllExams();
+    ExamResponse getExamById(int id);
+    ExamResponse updateExam(int id, ExamRequest request);
+    String deleteExam(int id, Authentication authentication);
 }

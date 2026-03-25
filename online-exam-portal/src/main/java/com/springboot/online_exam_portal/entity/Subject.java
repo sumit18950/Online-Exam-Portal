@@ -23,8 +23,8 @@ public class Subject {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    // Cascade delete: If subject is deleted, all its exams are deleted
-    @OneToMany(mappedBy = "subject", cascade = CascadeType.ALL, orphanRemoval = true)
+    // Prevent lazy-loading serialization issues for subject responses.
     @JsonIgnore
+    @OneToMany(mappedBy = "subject", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Exams> exams;
 }
