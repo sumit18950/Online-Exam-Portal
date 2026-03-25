@@ -2,6 +2,7 @@ package com.springboot.online_exam_portal.service;
 
 import com.springboot.online_exam_portal.dto.ExamRequest;
 import com.springboot.online_exam_portal.dto.ExamResponse;
+import com.springboot.online_exam_portal.dto.SubjectRequest;
 import com.springboot.online_exam_portal.entity.Exams;
 import com.springboot.online_exam_portal.entity.Subject;
 import com.springboot.online_exam_portal.entity.User;
@@ -36,8 +37,31 @@ public class ExamServiceImpl implements ExamService {
     // ─── Subject ────────────────────────────────────────────────────────────
 
     @Override
-    public Subject saveSubject(Subject subject) {
-        return subjectRepo.save(Objects.requireNonNull(subject));
+    public Subject saveSubject(SubjectRequest request) {
+        Objects.requireNonNull(request, "Subject request cannot be null");
+        Subject subject = new Subject();
+        subject.setSubjectName(request.getSubjectName());
+        subject.setDescription(request.getDescription());
+        return subjectRepo.save(subject);
+    }
+
+    @Override
+    @Transactional
+    public Subject updateSubject(int id, SubjectRequest request) {
+        Subject existing = subjectRepo.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Subject not found with id: " + id));
+        if (request == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Subject payload is required");
+        }
+        if (request.getSubjectName() != null && !request.getSubjectName().isBlank()) {
+            existing.setSubjectName(request.getSubjectName());
+        }
+        if (request.getDescription() != null) {
+            existing.setDescription(request.getDescription());
+        }
+        Subject saved = subjectRepo.save(existing);
+        subjectRepo.flush();
+        return saved;
     }
 
     @Override
