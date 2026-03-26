@@ -55,8 +55,11 @@ public class ExamEnrollment {
 
     @Override
     public String toString() {
-        return "ExamEnrollment [id=" + id + ", examId=" + examId + ", userId=" + userId + ", enrolledAt=" + enrolledAt
-                + "]";
+        return "ExamEnrollment{" +
+                "id=" + id +
+                ", examId=" + examId +
+                ", userId=" + userId +
+                ", enrolledAt=" + enrolledAt +
+                '}';
     }
-
 }

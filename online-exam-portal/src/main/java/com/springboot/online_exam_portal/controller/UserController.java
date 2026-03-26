@@ -81,11 +81,6 @@ public class UserController {
         return userRepository.findAll();
     }
 
-    // 4.1 GET ALL STUDENT PROFILES (TEACHER)
-    @GetMapping("/students")
-    public List<User> getAllStudentProfiles() {
-        return userRepository.findByRole_RoleNameIgnoreCase(ROLE_STUDENT);
-    }
     // 5. GET USER BY ID (ADMIN, or TEACHER for STUDENT users only)
     @GetMapping("/{id}")
     public User getUserById(@PathVariable Long id, Authentication authentication) {

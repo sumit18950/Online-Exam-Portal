@@ -1,54 +1,43 @@
 package com.springboot.online_exam_portal.exception;
 
-import com.springboot.online_exam_portal.dto.ApiResponse;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.time.LocalDateTime;
+import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    /**
-     * Handle UnauthorizedException
-     */
-    @ExceptionHandler(UnauthorizedException.class)
-    public ResponseEntity<?> handleUnauthorizedException(
-            UnauthorizedException ex,
-            WebRequest request) {
-        ApiResponse response = new ApiResponse(
-                "error",
-                ex.getMessage()
-        );
-        return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<Map<String, Object>> handleResponseStatusException(ResponseStatusException ex) {
+        HttpStatus status = HttpStatus.valueOf(ex.getStatusCode().value());
+        return buildError(status, ex.getReason());
     }
 
-    /**
-     * Handle RuntimeException
-     */
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<Map<String, Object>> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
+        // Fallback for DB-level unique constraints (e.g., duplicated email).
+        return buildError(HttpStatus.CONFLICT, "Email already exists");
+    }
+
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<?> handleRuntimeException(
-            RuntimeException ex,
-            WebRequest request) {
-        ApiResponse response = new ApiResponse(
-                "error",
-                ex.getMessage()
-        );
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    public ResponseEntity<Map<String, Object>> handleRuntimeException(RuntimeException ex) {
+        return buildError(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
-    /**
-     * Handle all other exceptions
-     */
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> handleGlobalException(
-            Exception ex,
-            WebRequest request) {
-        ApiResponse response = new ApiResponse(
-                "error",
-                "An unexpected error occurred: " + ex.getMessage()
+    private ResponseEntity<Map<String, Object>> buildError(HttpStatus status, String message) {
+        String finalMessage = (message == null || message.isBlank()) ? "Request failed" : message;
+        Map<String, Object> body = Map.of(
+//                "timestamp", LocalDateTime.now().toString(),
+//                "status", status.value(),
+//                "error", status.getReasonPhrase(),
+                "message", finalMessage
         );
-        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        return ResponseEntity.status(status).body(body);
     }
 }
