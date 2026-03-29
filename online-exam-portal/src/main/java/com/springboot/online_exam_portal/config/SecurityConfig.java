@@ -110,6 +110,26 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/exams/**").hasAnyRole("ADMIN", "TEACHER")
                         .requestMatchers(HttpMethod.GET, "/api/exams/**").authenticated()
 
+
+                        // Get all results → ADMIN, TEACHER
+                        .requestMatchers(HttpMethod.GET, "/results").hasAnyRole("ADMIN", "TEACHER")
+
+                        .requestMatchers(HttpMethod.GET, "/results/*").hasAnyRole("ADMIN", "TEACHER", "STUDENT")
+
+                        .requestMatchers(HttpMethod.GET, "/results/user/**").hasAnyRole("ADMIN", "TEACHER", "STUDENT")
+
+                        .requestMatchers(HttpMethod.GET, "/results/exam/**").hasAnyRole("ADMIN", "TEACHER")
+
+                        .requestMatchers(HttpMethod.GET, "/results/leaderboard/**").hasAnyRole("ADMIN", "TEACHER", "STUDENT")
+
+                        .requestMatchers(HttpMethod.PUT, "/results/review").hasAnyRole("ADMIN", "TEACHER")
+
+                        .requestMatchers(HttpMethod.GET, "/results/review-history/**").hasAnyRole("ADMIN", "TEACHER")
+
+                        .requestMatchers(HttpMethod.GET, "/results/certificate/**").hasAnyRole("ADMIN", "TEACHER", "STUDENT")
+
+                        .requestMatchers(HttpMethod.GET, "/results/export/**").hasAnyRole("ADMIN", "TEACHER")
+
                         // ALL other APIs require login
                         .anyRequest().authenticated()
                 )
