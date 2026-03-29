@@ -34,10 +34,7 @@ public class Exams {
     
     private String status; // SCHEDULED, ONGOING, COMPLETED
 
-    // COMMENT: @JsonBackReference = "child" side of the relationship.
-    // When Exams is serialized, the "subject" field is SKIPPED to prevent
-    // the circular loop: Subject→Exams→Subject→Exams→...
-    // Subject details are included via ExamResponse DTO (subjectId, subjectName).
+
     @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "subject_id", nullable = false)

@@ -32,9 +32,8 @@ public class ExamController {
         this.userRepository = userRepository;
     }
 
-    // ╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç Subject Endpoints ╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç
 
-    // GET /api/exams/subjects        ╬ô├Ñ├å list all subjects
+    // GET /api/exams/subjects      list all subjects
     @GetMapping("/subjects")
     public ResponseEntity<List<SubjectResponse>> listSubjects() {
         List<SubjectResponse> subjects = service.getAllSubjects().stream()
@@ -43,13 +42,13 @@ public class ExamController {
         return ResponseEntity.ok(subjects);
     }
 
-    // GET /api/exams/subjects/{id}   ╬ô├Ñ├å get one subject by id
+    // GET /api/exams/subjects/{id}
     @GetMapping("/subjects/{id}")
     public ResponseEntity<SubjectResponse> getSubject(@PathVariable int id) {
         return ResponseEntity.ok(toSubjectResponse(service.getSubjectById(id)));
     }
 
-    // POST /api/exams/subjects       ╬ô├Ñ├å add a new subject
+    // POST /api/exams/subjects
     @PostMapping("/subjects")
     public ResponseEntity<SubjectResponse> addSubject(@RequestBody SubjectRequest request,
                                                       @RequestHeader(value = "userId", required = false) Long userId,
@@ -60,7 +59,7 @@ public class ExamController {
         return ResponseEntity.status(HttpStatus.CREATED).body(toSubjectResponse(saved));
     }
 
-    // PUT /api/exams/subjects/{id}   ╬ô├Ñ├å update a subject (full update)
+    // PUT /api/exams/subjects/{id}
     @PutMapping("/subjects/{id}")
     public ResponseEntity<SubjectResponse> updateSubject(@PathVariable int id,
                                                          @RequestBody SubjectRequest request,
@@ -71,7 +70,7 @@ public class ExamController {
         return ResponseEntity.ok(toSubjectResponse(service.updateSubject(id, request)));
     }
 
-    // PATCH /api/exams/subjects/{id} ╬ô├Ñ├å partial update a subject
+    // PATCH /api/exams/subjects/{id}
     @PatchMapping("/subjects/{id}")
     public ResponseEntity<SubjectResponse> patchSubject(@PathVariable int id,
                                                         @RequestBody SubjectRequest request,
@@ -82,7 +81,7 @@ public class ExamController {
         return ResponseEntity.ok(toSubjectResponse(service.updateSubject(id, request)));
     }
 
-    // DELETE /api/exams/subjects/{id} ╬ô├Ñ├å delete subject (cascades to its exams)
+    // DELETE /api/exams/subjects/{id}
     @DeleteMapping("/subjects/{id}")
     public ResponseEntity<String> deleteSubject(@PathVariable int id,
                                                 @RequestHeader(value = "userId", required = false) Long userId,
@@ -92,21 +91,21 @@ public class ExamController {
         return ResponseEntity.ok(service.deleteSubject(id, toAuthentication(actor)));
     }
 
-    // ╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç Exam Endpoints ╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç╬ô├╢├ç
+    // Exam Endpoints
 
-    // GET /api/exams                 ╬ô├Ñ├å list all exams
+    // GET /api/exams                list all exams
     @GetMapping
     public ResponseEntity<List<ExamResponse>> listExams() {
         return ResponseEntity.ok(service.getAllExams());
     }
 
-    // GET /api/exams/{id}            ╬ô├Ñ├å get one exam by id
+    // GET /api/exams/{id}           get one exam by id
     @GetMapping("/{id}")
     public ResponseEntity<ExamResponse> getExam(@PathVariable int id) {
         return ResponseEntity.ok(service.getExamById(id));
     }
 
-    // POST /api/exams                ╬ô├Ñ├å create a new exam
+    // POST /api/exams               create a new exam
     @PostMapping
     public ResponseEntity<ExamResponse> addExam(@RequestBody ExamRequest request,
                                                 @RequestHeader(value = "userId", required = false) Long userId,
@@ -117,7 +116,7 @@ public class ExamController {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.createExam(request));
     }
 
-    // POST /api/exams/admin/create   ╬ô├Ñ├å compatibility route for documented admin API
+    // POST /api/exams/admin/create   compatibility route for documented admin API
     @PostMapping("/admin/create")
     public ResponseEntity<ExamResponse> addExamAdmin(@RequestBody ExamRequest request,
                                                      @RequestHeader(value = "userId", required = false) Long userId,
@@ -125,7 +124,7 @@ public class ExamController {
         return addExam(request, userId, authentication);
     }
 
-    // POST /api/exams/teacher/create ╬ô├Ñ├å compatibility route for documented teacher API
+    // POST /api/exams/teacher/create  compatibility route for documented teacher API
     @PostMapping("/teacher/create")
     public ResponseEntity<ExamResponse> addExamTeacher(@RequestBody ExamRequest request,
                                                        @RequestHeader(value = "userId", required = false) Long userId,
@@ -133,7 +132,7 @@ public class ExamController {
         return addExam(request, userId, authentication);
     }
 
-    // PUT /api/exams/{id}            ╬ô├Ñ├å update an existing exam
+    // PUT /api/exams/{id}            update an existing exam
     @PutMapping("/{id}")
     public ResponseEntity<ExamResponse> updateExam(@PathVariable int id,
                                                     @RequestBody ExamRequest request,
@@ -146,7 +145,7 @@ public class ExamController {
         return ResponseEntity.ok(service.updateExam(id, request));
     }
 
-    // PATCH /api/exams/{id}          ╬ô├Ñ├å partial update an existing exam
+    // PATCH /api/exams/{id}        partial update an existing exam
     @PatchMapping("/{id}")
     public ResponseEntity<ExamResponse> patchExam(@PathVariable int id,
                                                    @RequestBody ExamRequest request,
@@ -158,7 +157,7 @@ public class ExamController {
         return ResponseEntity.ok(service.updateExam(id, request));
     }
 
-    // PUT /api/exams/admin/update/{id}   ╬ô├Ñ├å compatibility route for documented admin API
+    // PUT /api/exams/admin/update/{id}   compatibility route for documented admin API
     @PutMapping("/admin/update/{id}")
     public ResponseEntity<ExamResponse> updateExamAdmin(@PathVariable int id,
                                                         @RequestBody ExamRequest request,
@@ -167,7 +166,7 @@ public class ExamController {
         return updateExam(id, request, userId, authentication);
     }
 
-    // PATCH /api/exams/admin/update/{id} ╬ô├Ñ├å compatibility route for documented admin API
+    // PATCH /api/exams/admin/update/{id}  compatibility route for documented admin API
     @PatchMapping("/admin/update/{id}")
     public ResponseEntity<ExamResponse> patchExamAdmin(@PathVariable int id,
                                                        @RequestBody ExamRequest request,
@@ -176,7 +175,7 @@ public class ExamController {
         return updateExam(id, request, userId, authentication);
     }
 
-    // PUT /api/exams/teacher/update/{id} ╬ô├Ñ├å compatibility route for documented teacher API
+    // PUT /api/exams/teacher/update/{id}  compatibility route for documented teacher API
     @PutMapping("/teacher/update/{id}")
     public ResponseEntity<ExamResponse> updateExamTeacher(@PathVariable int id,
                                                           @RequestBody ExamRequest request,
@@ -185,7 +184,7 @@ public class ExamController {
         return updateExam(id, request, userId, authentication);
     }
 
-    // PATCH /api/exams/teacher/update/{id} ╬ô├Ñ├å compatibility route for documented teacher API
+    // PATCH /api/exams/teacher/update/{id}  compatibility route for documented teacher API
     @PatchMapping("/teacher/update/{id}")
     public ResponseEntity<ExamResponse> patchExamTeacher(@PathVariable int id,
                                                          @RequestBody ExamRequest request,
@@ -194,7 +193,7 @@ public class ExamController {
         return updateExam(id, request, userId, authentication);
     }
 
-    // DELETE /api/exams/{id}         ╬ô├Ñ├å delete an exam
+    // DELETE /api/exams/{id}         delete an exam
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteExam(@PathVariable int id,
                                              @RequestHeader(value = "userId", required = false) Long userId,
@@ -204,7 +203,7 @@ public class ExamController {
         return ResponseEntity.ok(service.deleteExam(id, toAuthentication(actor)));
     }
 
-    // DELETE /api/exams/admin/delete/{id}   ╬ô├Ñ├å compatibility route for documented admin API
+    // DELETE /api/exams/admin/delete/{id}   compatibility route for documented admin API
     @DeleteMapping("/admin/delete/{id}")
     public ResponseEntity<String> deleteExamAdmin(@PathVariable int id,
                                                   @RequestHeader(value = "userId", required = false) Long userId,
@@ -212,7 +211,7 @@ public class ExamController {
         return deleteExam(id, userId, authentication);
     }
 
-    // DELETE /api/exams/teacher/delete/{id} ╬ô├Ñ├å compatibility route for documented teacher API
+    // DELETE /api/exams/teacher/delete/{id}  compatibility route for documented teacher API
     @DeleteMapping("/teacher/delete/{id}")
     public ResponseEntity<String> deleteExamTeacher(@PathVariable int id,
                                                     @RequestHeader(value = "userId", required = false) Long userId,
@@ -220,13 +219,13 @@ public class ExamController {
         return deleteExam(id, userId, authentication);
     }
 
-    // GET /api/exams/admin/all ╬ô├Ñ├å compatibility route for documented admin API
+    // GET /api/exams/admin/all compatibility route for documented admin API
     @GetMapping("/admin/all")
     public ResponseEntity<List<ExamResponse>> listExamsAdmin() {
         return listExams();
     }
 
-    // GET /api/exams/teacher/all ╬ô├Ñ├å compatibility route for documented teacher API
+    // GET /api/exams/teacher/all   compatibility route for documented teacher API
     @GetMapping("/teacher/all")
     public ResponseEntity<List<ExamResponse>> listExamsTeacher() {
         return listExams();
