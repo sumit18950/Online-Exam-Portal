@@ -7,7 +7,7 @@ import com.springboot.online_exam_portal.entity.Result;
 import com.springboot.online_exam_portal.entity.StudentAnswer;
 import com.springboot.online_exam_portal.repository.OptionRepository;
 import com.springboot.online_exam_portal.repository.QuestionRepository;
-import com.springboot.online_exam_portal.repository.ResultRepository;
+import com.springboot.online_exam_portal.resultAnalysis.repository.ResultRepository;
 import com.springboot.online_exam_portal.repository.StudentAnswerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

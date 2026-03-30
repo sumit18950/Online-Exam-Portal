@@ -49,21 +49,21 @@ public class ResultServiceImpl implements ResultService {
         dto.setEvaluatedAt(result.getEvaluatedAt());
 
         User user =
-                userRepository.findById(result.getUserId()).orElse(null);
+                userRepository.findById(result.getUserId()).orElseThrow(()-> new RuntimeException("User not found"));
 
-        if (user != null) {
-            dto.setUsername(user.getUsername());
-        }
+
+        dto.setUsername(user.getUsername());
+
 //
 //        Exams exam =
 //                examsRepository.findById (result.getExamId()).orElse(null);
 
         Integer examId = result.getExamId() == null ? null : Math.toIntExact(result.getExamId());
-        Exams exam = examId == null ? null : examsRepository.findById(examId).orElse(null);
+        Exams exam = examId == null ? null : examsRepository.findById(examId).orElseThrow(()->new RuntimeException("Exam not found"));
 
-        if (exam != null) {
-            dto.setExamTitle(exam.getExamTitle());
-        }
+
+        dto.setExamTitle(exam.getExamTitle());
+
 
         return dto;
     }
@@ -78,18 +78,18 @@ public class ResultServiceImpl implements ResultService {
         dto.setGrade(result.getGrade());
 
         User user =
-                userRepository.findById(result.getUserId()).orElse(null);
+                userRepository.findById(result.getUserId()).orElseThrow(()->new RuntimeException("User not found"));
 
-        if (user != null) {
-            dto.setUsername(user.getUsername());
-        }
+
+        dto.setUsername(user.getUsername());
+
 
         Integer examId = result.getExamId() == null ? null : Math.toIntExact(result.getExamId());
-        Exams exam = examId == null ? null : examsRepository.findById(examId).orElse(null);
+        Exams exam = examId == null ? null : examsRepository.findById(examId).orElseThrow(()->new RuntimeException("Exam not found"));
 
-        if (exam != null) {
+
             dto.setExamTitle(exam.getExamTitle());
-        }
+
 
         return dto;
     }
@@ -109,9 +109,9 @@ public class ResultServiceImpl implements ResultService {
     public ResultResponseDTO getResultById(Long id) {
 
         Result result =
-                resultRepository.findById(id).orElse(null);
+                resultRepository.findById(id).orElseThrow(()->new RuntimeException("Result of this ID doesn't exist"));
 
-        if (result == null) return null;
+        //if (result == null) return null;
 
         return convertToDTO(result);
     }
@@ -154,11 +154,8 @@ public class ResultServiceImpl implements ResultService {
         // 1. find result
         Result result =
                 resultRepository.findById(request.getResultId())
-                        .orElse(null);
+                        .orElseThrow(()->new RuntimeException("Result of this ID doesn't exist"));
 
-        if (result == null) {
-            return null;
-        }
 
         // 2. store old values
         Integer oldScore = result.getScore();
@@ -223,32 +220,28 @@ public class ResultServiceImpl implements ResultService {
     public ResultCertificateDTO getCertificate(Long resultId) {
 
         Result result =
-                resultRepository.findById(resultId).orElse(null);
-
-        if (result == null) {
-            return null;
-        }
+                resultRepository.findById(resultId).orElseThrow(()->new RuntimeException("Result of this ID doesn't exist"));
 
         User user =
-                userRepository.findById(result.getUserId()).orElse(null);
+                userRepository.findById(result.getUserId()).orElseThrow(()->new RuntimeException("User not found"));
 
 //        Exams exam =
 //                examsRepository.findById(result.getExamId()).orElse(null);
 
         Integer examId = result.getExamId() == null ? null : Math.toIntExact(result.getExamId());
-        Exams exam = examId == null ? null : examsRepository.findById(examId).orElse(null);
+        Exams exam = examId == null ? null : examsRepository.findById(examId).orElseThrow(()->new RuntimeException("Exam not found"));
 
 
         ResultCertificateDTO dto = new ResultCertificateDTO();
 
-        if (user != null) {
-            dto.setStudentName(user.getUsername());
-        }
 
-        if (exam != null) {
-            dto.setExamTitle(exam.getExamTitle());
-            dto.setExamDate(exam.getExamDate());
-        }
+        dto.setStudentName(user.getUsername());
+
+
+
+        dto.setExamTitle(exam.getExamTitle());
+        dto.setExamDate(exam.getExamDate());
+
 
         dto.setScore(result.getScore());
         dto.setGrade(result.getGrade());

@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.springboot.online_exam_portal.resultAnalysis.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,67 +20,67 @@ public class ResultController {
 
     // GET /results
     @GetMapping
-    public List<ResultResponseDTO> getAllResults() {
+    public ResponseEntity<List<ResultResponseDTO>> getAllResults() {
 
-        return resultService.getAllResults();
+        return ResponseEntity.ok(resultService.getAllResults());
     }
 
 
     // GET /results/{id}
     @GetMapping("/{id}")
-    public ResultResponseDTO getResultById(@PathVariable Long id) {
+    public ResponseEntity<ResultResponseDTO> getResultById(@PathVariable Long id) {
 
-        return resultService.getResultById(id);
+        return ResponseEntity.ok(resultService.getResultById(id));
     }
 
 
     // GET /results/user/{userId}
     @GetMapping("/user/{userId}")
-    public List<ResultResponseDTO> getResultsByUserId(
+    public ResponseEntity<List<ResultResponseDTO>> getResultsByUserId(
             @PathVariable Long userId) {
 
-        return resultService.getResultsByUserId(userId);
+        return ResponseEntity.ok(resultService.getResultsByUserId(userId));
     }
 
 
     // GET /results/exam/{examId}
     @GetMapping("/exam/{examId}")
-    public List<ResultResponseDTO> getResultsByExamId(
+    public ResponseEntity<List<ResultResponseDTO>> getResultsByExamId(
             @PathVariable Long examId) {
 
-        return resultService.getResultsByExamId(examId);
+        return ResponseEntity.ok(resultService.getResultsByExamId(examId));
     }
 
 
     // GET /results/leaderboard/{examId}
     @GetMapping("/leaderboard/{examId}")
-    public List<LeaderboardDTO> getLeaderboard(
+    public ResponseEntity<List<LeaderboardDTO>> getLeaderboard(
             @PathVariable Long examId) {
 
-        return resultService.getLeaderboardByExamId(examId);
+        return ResponseEntity.ok(resultService.getLeaderboardByExamId(examId));
     }
 
     @PutMapping("/review")
-    public ResultResponseDTO reviewResult(
+    public ResponseEntity<ResultResponseDTO> reviewResult(
 
             @RequestBody ResultReviewRequestDTO request) {
 
-        return resultService.reviewResult(request);
+        return ResponseEntity.ok(resultService.reviewResult(request));
 
     }
 
     @GetMapping("/review-history/{resultId}")
-    public List<ScoreReviewHistoryDTO> getReviewHistory(
+    public ResponseEntity<List<ScoreReviewHistoryDTO>> getReviewHistory(
             @PathVariable Long resultId) {
 
-        return resultService.getReviewHistory(resultId);
+        return ResponseEntity.ok(resultService.getReviewHistory(resultId));
     }
 
     @GetMapping("/certificate/{resultId}")
-    public ResultCertificateDTO getCertificate(
+    public ResponseEntity<ResultCertificateDTO> getCertificate(
             @PathVariable Long resultId) {
 
-        return resultService.getCertificate(resultId);
+        return ResponseEntity.ok(resultService.getCertificate(resultId));
     }
 
     @GetMapping("/export/exam/{examId}")
