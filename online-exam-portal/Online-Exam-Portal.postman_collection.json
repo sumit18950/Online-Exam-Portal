@@ -1,0 +1,476 @@
+{
+  "info": {
+    "name": "Online Exam Portal API",
+    "description": "Postman collection generated from controllers and DTOs in the Online-Exam-Portal project.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{jwtToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8081" },
+    { "key": "jwtToken", "value": "" },
+    { "key": "adminToken", "value": "" },
+    { "key": "teacherToken", "value": "" },
+    { "key": "studentToken", "value": "" },
+    { "key": "registerUsername", "value": "student1" },
+    { "key": "registerEmail", "value": "student1@example.com" },
+    { "key": "registerPassword", "value": "Student@123" },
+    { "key": "registerRole", "value": "STUDENT" },
+    { "key": "loginEmail", "value": "student1@example.com" },
+    { "key": "loginPassword", "value": "Student@123" },
+    { "key": "adminEmail", "value": "admin1@example.com" },
+    { "key": "adminPassword", "value": "Admin@123" },
+    { "key": "teacherEmail", "value": "teacher1@example.com" },
+    { "key": "teacherPassword", "value": "Teacher@123" },
+    { "key": "studentEmail", "value": "student1@example.com" },
+    { "key": "studentPassword", "value": "Student@123" },
+    { "key": "newPassword", "value": "Student@1234" },
+    { "key": "subjectName", "value": "Mathematics" },
+    { "key": "subjectDescription", "value": "Class 10 level algebra and arithmetic" },
+    { "key": "examTitle", "value": "Math Practice Test" },
+    { "key": "examDate", "value": "2026-03-24" },
+    { "key": "examTime", "value": "00:00:00" },
+    { "key": "durationMinutes", "value": "10080" },
+    { "key": "createdBy", "value": "1" },
+    { "key": "userId", "value": "1" },
+    { "key": "subjectId", "value": "1" },
+    { "key": "examId", "value": "1" },
+    { "key": "questionId", "value": "1" },
+    { "key": "optionId", "value": "1" },
+    { "key": "resultId", "value": "1" },
+    { "key": "reviewedBy", "value": "1" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{registerUsername}}\",\n  \"email\": \"{{registerEmail}}\",\n  \"password\": \"{{registerPassword}}\",\n  \"role\": \"{{registerRole}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/register"
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const raw = pm.response.text().trim();",
+                  "let token = raw;",
+                  "try {",
+                  "  const parsed = JSON.parse(raw);",
+                  "  token = typeof parsed === 'string' ? parsed : (parsed.token || parsed.jwt || parsed.accessToken || '');",
+                  "} catch (e) {}",
+                  "if (token.startsWith('\\\"') && token.endsWith('\\\"')) {",
+                  "  token = token.slice(1, -1);",
+                  "}",
+                  "if (token) {",
+                  "  pm.collectionVariables.set('jwtToken', token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{loginEmail}}\",\n  \"password\": \"{{loginPassword}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/login"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/users/profile"
+          }
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"updated-user\"\n}"
+            },
+            "url": "{{baseUrl}}/api/users/update-profile"
+          }
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"oldPassword\": \"{{loginPassword}}\",\n  \"newPassword\": \"{{newPassword}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/users/change-password"
+          }
+        },
+        {
+          "name": "Get All Users (Admin)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/users/all"
+          }
+        },
+        {
+          "name": "Get User By ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/users/{{userId}}"
+          }
+        },
+        {
+          "name": "Get User By ID (Legacy)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/users/by-id/{{userId}}"
+          }
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"teacher1-updated\",\n  \"email\": \"teacher1.updated@example.com\",\n  \"role\": \"TEACHER\"\n}"
+            },
+            "url": "{{baseUrl}}/api/users/{{userId}}"
+          }
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/users/{{userId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Management (Subjects and Exams)",
+      "item": [
+        {
+          "name": "Add Subject",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"subjectName\": \"{{subjectName}}\",\n  \"description\": \"{{subjectDescription}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/management/subjects"
+          }
+        },
+        {
+          "name": "Delete Subject",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/management/subjects/{{subjectId}}"
+          }
+        },
+        {
+          "name": "Add Exam",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"examTitle\": \"{{examTitle}}\",\n  \"examDate\": \"{{examDate}}\",\n  \"examTime\": \"{{examTime}}\",\n  \"durationMinutes\": {{durationMinutes}},\n  \"createdBy\": {{createdBy}}\n}"
+            },
+            "url": "{{baseUrl}}/api/management/exams/{{subjectId}}"
+          }
+        },
+        {
+          "name": "List Exams",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/management/exams"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Questions",
+      "item": [
+        {
+          "name": "Upload Question",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"exam\": { \"id\": {{examId}} },\n  \"subject\": { \"id\": {{subjectId}} },\n  \"questionText\": \"2 + 2 = ?\",\n  \"questionType\": \"MCQ\",\n  \"marks\": 5,\n  \"options\": [\n    { \"optionText\": \"3\", \"isCorrect\": false },\n    { \"optionText\": \"4\", \"isCorrect\": true },\n    { \"optionText\": \"5\", \"isCorrect\": false }\n  ]\n}"
+            },
+            "url": "{{baseUrl}}/api/questions/upload"
+          }
+        },
+        {
+          "name": "Get Questions By Subject",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/questions/subject/{{subjectId}}"
+          }
+        },
+        {
+          "name": "Get Question By Subject and Question",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/questions/subject/{{subjectId}}/question/{{questionId}}"
+          }
+        },
+        {
+          "name": "Update Question",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"questionText\": \"What is 5 + 7?\",\n  \"questionType\": \"MCQ\",\n  \"marks\": 5,\n  \"options\": [\n    { \"optionText\": \"11\", \"isCorrect\": false },\n    { \"optionText\": \"12\", \"isCorrect\": true }\n  ]\n}"
+            },
+            "url": "{{baseUrl}}/api/questions/subject/{{subjectId}}/question/{{questionId}}"
+          }
+        },
+        {
+          "name": "Delete Question",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/questions/subject/{{subjectId}}/question/{{questionId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Options",
+      "item": [
+        {
+          "name": "Add Option",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"optionText\": \"Sample option\",\n  \"isCorrect\": false\n}"
+            },
+            "url": "{{baseUrl}}/api/options/subject/{{subjectId}}/question/{{questionId}}"
+          }
+        },
+        {
+          "name": "Get Options By Question",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/options/subject/{{subjectId}}/question/{{questionId}}"
+          }
+        },
+        {
+          "name": "Update Option",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"optionText\": \"Updated option\",\n  \"isCorrect\": true\n}"
+            },
+            "url": "{{baseUrl}}/api/options/subject/{{subjectId}}/question/{{questionId}}/option/{{optionId}}"
+          }
+        },
+        {
+          "name": "Update All Options",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  { \"optionText\": \"First option\", \"isCorrect\": false },\n  { \"optionText\": \"Second option\", \"isCorrect\": true }\n]"
+            },
+            "url": "{{baseUrl}}/api/options/subject/{{subjectId}}/question/{{questionId}}"
+          }
+        },
+        {
+          "name": "Delete Option",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/options/subject/{{subjectId}}/question/{{questionId}}/option/{{optionId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Conduct Exam",
+      "item": [
+        {
+          "name": "Enroll",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/exam/enroll?examId={{examId}}&userId={{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["exam", "enroll"],
+              "query": [
+                { "key": "examId", "value": "{{examId}}" },
+                { "key": "userId", "value": "{{userId}}" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Questions For Conducted Exam",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/exam/questions/{{examId}}/{{userId}}"
+          }
+        },
+        {
+          "name": "Get Remaining Time (timmer)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/exam/timmer/{{examId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Answers",
+      "item": [
+        {
+          "name": "Submit Answer",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"examId\": {{examId}},\n  \"questionId\": {{questionId}},\n  \"userId\": {{userId}},\n  \"selectedOptionId\": {{optionId}},\n  \"answerText\": \"\"\n}"
+            },
+            "url": "{{baseUrl}}/answers/submit"
+          }
+        },
+        {
+          "name": "Finish Exam",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/answers/finish?examId={{examId}}&userId={{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["answers", "finish"],
+              "query": [
+                { "key": "examId", "value": "{{examId}}" },
+                { "key": "userId", "value": "{{userId}}" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Results",
+      "item": [
+        {
+          "name": "Get All Results",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/results"
+          }
+        },
+        {
+          "name": "Get Result By ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/results/{{resultId}}"
+          }
+        },
+        {
+          "name": "Get Results By User",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/results/user/{{userId}}"
+          }
+        },
+        {
+          "name": "Get Results By Exam",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/results/exam/{{examId}}"
+          }
+        },
+        {
+          "name": "Get Leaderboard",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/results/leaderboard/{{examId}}"
+          }
+        },
+        {
+          "name": "Review Result",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resultId\": {{resultId}},\n  \"newScore\": 95.0,\n  \"newGrade\": \"A+\",\n  \"reviewReason\": \"Manual re-evaluation\",\n  \"reviewedBy\": {{reviewedBy}}\n}"
+            },
+            "url": "{{baseUrl}}/results/review"
+          }
+        }
+      ]
+    }
+  ]
+}

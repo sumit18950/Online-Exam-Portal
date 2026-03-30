@@ -1,4 +1,4 @@
-package com.springboot.online_exam_portal.entity;
+package com.springboot.online_exam_portal.resultAnalysis.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
