@@ -27,6 +27,7 @@ public class JwtUtil {
                 .signWith(getSigningKey())
                 .compact();
     }
+
     public String extractEmail(String token){
         return io.jsonwebtoken.Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())

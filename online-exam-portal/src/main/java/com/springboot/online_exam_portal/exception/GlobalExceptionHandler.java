@@ -10,9 +10,7 @@ import org.springframework.web.context.request.WebRequest;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    /**
-     * Handle UnauthorizedException
-     */
+
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<?> handleUnauthorizedException(
             UnauthorizedException ex,
@@ -24,9 +22,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
     }
 
-    /**
-     * Handle RuntimeException
-     */
+
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<?> handleRuntimeException(
             RuntimeException ex,
@@ -38,9 +34,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-    /**
-     * Handle all other exceptions
-     */
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleGlobalException(
             Exception ex,
