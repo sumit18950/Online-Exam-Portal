@@ -79,6 +79,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/error").permitAll()
 
+                        // ADMIN APIs
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN") //create-user
+
                         // SELF-SERVICE (authenticated users)
                         .requestMatchers(HttpMethod.GET, "/api/users/profile").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/users/update-profile").authenticated()

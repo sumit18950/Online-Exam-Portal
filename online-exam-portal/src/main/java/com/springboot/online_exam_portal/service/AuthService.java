@@ -9,12 +9,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Set;
 
 @Service
 public class AuthService {
 
-    private static final Set<String> ALLOWED_ROLES = Set.of("ADMIN", "TEACHER", "STUDENT");
+    private static final String DEFAULT_REGISTRATION_ROLE = "ROLE_STUDENT";
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
@@ -33,13 +32,8 @@ public class AuthService {
             throw new RuntimeException("Email already exists");
         }
 
-        String requestedRole = request.getRole() == null ? "STUDENT" : request.getRole().trim().toUpperCase();
-        if (!ALLOWED_ROLES.contains(requestedRole)) {
-            throw new RuntimeException("Invalid role: " + requestedRole);
-        }
-
-        Role role = roleRepository.findByRoleName(requestedRole)
-                .orElseThrow(() -> new RuntimeException("Role not found in DB: " + requestedRole));
+        Role role = roleRepository.findByRoleName(DEFAULT_REGISTRATION_ROLE.replace("ROLE_", ""))
+                .orElseThrow(() -> new RuntimeException("Role not found in DB: " + DEFAULT_REGISTRATION_ROLE));
 
         User user = new User();
         user.setUsername(request.getUsername());

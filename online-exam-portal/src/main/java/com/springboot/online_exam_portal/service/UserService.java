@@ -1,5 +1,6 @@
 package com.springboot.online_exam_portal.service;
 
+import com.springboot.online_exam_portal.dto.AdminCreateUserRequest;
 import com.springboot.online_exam_portal.dto.RegisterRequest;
 import com.springboot.online_exam_portal.entity.Role;
 import com.springboot.online_exam_portal.entity.User;
@@ -11,13 +12,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
-import java.util.Set;
+import java.util.Locale;
 
 @Service
 public class UserService {
 
-    private static final String DEFAULT_REGISTRATION_ROLE = "STUDENT";
-    private static final Set<String> ALLOWED_REGISTRATION_ROLES = Set.of("ADMIN", "TEACHER", "STUDENT");
+    private static final String DEFAULT_REGISTRATION_ROLE = "ROLE_STUDENT";
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
@@ -33,31 +33,26 @@ public class UserService {
     }
 
     public User register(RegisterRequest request){
-
-        if(userRepository.existsByEmail(request.getEmail())){
-            throw new ResponseStatusException(HttpStatus.CONFLICT,"Email already exists");
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
         }
 
-        String requestedRole = request.getRole() == null
-                ? DEFAULT_REGISTRATION_ROLE
-                : request.getRole().trim().toUpperCase();
+        Role role = findRoleOrThrow(DEFAULT_REGISTRATION_ROLE);
+        User user = buildUser(request.getUsername(), request.getEmail(), request.getPassword(), role);
+        return userRepository.save(user);
+    }
 
-        if (!ALLOWED_REGISTRATION_ROLES.contains(requestedRole)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid role: " + requestedRole);
+    public User createUserByAdmin(AdminCreateUserRequest request) {
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
         }
 
-        Role role = roleRepository
-                .findByRoleName(requestedRole)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Role not found: " + requestedRole));
+        if (request.getRole() == null || request.getRole().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Role is required");
+        }
 
-        User user = new User();
-
-        user.setUsername(request.getUsername());
-        user.setEmail(request.getEmail());
-        user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
-        user.setRole(role);
-        user.setCreatedAt(LocalDateTime.now());
-
+        Role role = findRoleOrThrow(request.getRole());
+        User user = buildUser(request.getUsername(), request.getEmail(), request.getPassword(), role);
         return userRepository.save(user);
     }
 
@@ -72,5 +67,29 @@ public class UserService {
         }
 
         return user;
+    }
+
+    private User buildUser(String username, String email, String rawPassword, Role role) {
+        User user = new User();
+        user.setUsername(username);
+        user.setEmail(email);
+        user.setPasswordHash(passwordEncoder.encode(rawPassword));
+        user.setRole(role);
+        user.setCreatedAt(LocalDateTime.now());
+        return user;
+    }
+
+    private Role findRoleOrThrow(String roleInput) {
+        String normalizedRole = normalizeRoleName(roleInput);
+        return roleRepository.findByRoleName(normalizedRole)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Role not found: " + normalizedRole));
+    }
+
+    private String normalizeRoleName(String roleInput) {
+        String normalized = roleInput.trim().toUpperCase(Locale.ROOT);
+        if (normalized.startsWith("ROLE_")) {
+            normalized = normalized.substring("ROLE_".length());
+        }
+        return normalized;
     }
 }
