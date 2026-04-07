@@ -67,7 +67,6 @@ public class QuestionServiceImpl implements QuestionService {
     @Transactional
     public Questions updateQuestion(Integer id, Questions questionDetails) {
         Questions existing = getQuestionById(id);
-
         existing.setQuestionText(questionDetails.getQuestionText());
         existing.setQuestionType(questionDetails.getQuestionType());
         existing.setMarks(questionDetails.getMarks());
@@ -100,4 +99,3 @@ public class QuestionServiceImpl implements QuestionService {
         questionRepo.deleteById(Objects.requireNonNull(id));
     }
 }
-
