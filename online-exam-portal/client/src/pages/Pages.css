@@ -1,0 +1,108 @@
+.home-card,
+.error-card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 3rem 2rem;
+  max-width: 800px;
+  margin: 2rem auto;
+  text-align: center;
+}
+
+.home-card h1,
+.error-card h1 {
+  color: #2c3e50;
+  font-size: 2rem;
+  margin: 0 0 1rem 0;
+}
+
+.home-card p,
+.error-card p {
+  color: #666;
+  font-size: 1.1rem;
+  margin: 0 0 2rem 0;
+}
+
+.features {
+  text-align: left;
+  background-color: #f9f9f9;
+  padding: 2rem;
+  border-radius: 8px;
+  margin-top: 2rem;
+}
+
+.features h2 {
+  color: #2c3e50;
+  margin: 0 0 1rem 0;
+  text-align: center;
+}
+
+.features ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.features li {
+  padding: 0.75rem 0;
+  color: #555;
+  border-bottom: 1px solid #eee;
+  position: relative;
+  padding-left: 2rem;
+}
+
+.features li:before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: #2ecc71;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.features li:last-child {
+  border-bottom: none;
+}
+
+.error-card {
+  background: linear-gradient(135deg, #fff5f5 0%, #ffe0e6 100%);
+  border: 2px solid #f8d7da;
+}
+
+.btn {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background-color: #667eea;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #5568d3;
+}
+
+@media (max-width: 768px) {
+  .home-card,
+  .error-card {
+    padding: 2rem 1rem;
+    margin: 1rem auto;
+  }
+
+  .home-card h1,
+  .error-card h1 {
+    font-size: 1.5rem;
+  }
+
+  .features {
+    padding: 1.5rem;
+  }
+}
