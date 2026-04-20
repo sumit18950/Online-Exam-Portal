@@ -7,6 +7,7 @@ public interface QuestionService {
     List<Questions> getAllQuestions();
     Questions getQuestionById(Integer id);
     List<Questions> getQuestionsBySubjectId(Integer subjectId);
+    List<Questions> getQuestionsByExamId(Long examId);
     Questions updateQuestion(Integer id, Questions question);
     void deleteQuestion(Integer id);
 }

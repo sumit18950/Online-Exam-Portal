@@ -18,8 +18,11 @@ export const Navbar = () => {
         return (
           <>
             <Link to="/admin-dashboard" className="nav-link">Dashboard</Link>
-            <Link to="/admin/users" className="nav-link">View Users</Link>
-            <Link to="/admin/create-user" className="nav-link">Create User</Link>
+            <Link to="/admin/users" className="nav-link">Users</Link>
+            <Link to="/admin/subjects" className="nav-link">Subjects</Link>
+            <Link to="/admin/exams" className="nav-link">Exams</Link>
+            <Link to="/admin/questions" className="nav-link">Questions</Link>
+            <Link to="/admin/results" className="nav-link">Results</Link>
           </>
         );
       case 'TEACHER':

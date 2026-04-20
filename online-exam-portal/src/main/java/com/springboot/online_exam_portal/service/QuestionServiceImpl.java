@@ -64,6 +64,11 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
+    public List<Questions> getQuestionsByExamId(Long examId) {
+        return questionRepo.findByExamId(examId);
+    }
+
+    @Override
     @Transactional
     public Questions updateQuestion(Integer id, Questions questionDetails) {
         Questions existing = getQuestionById(id);

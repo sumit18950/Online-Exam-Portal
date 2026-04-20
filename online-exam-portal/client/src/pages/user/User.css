@@ -1,25 +1,28 @@
 .container {
-  max-width: 1200px;
+  width: 100%;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 2rem 20px;
-  min-height: calc(100vh - 70px);
+  padding: 2rem 40px;
+  min-height: calc(100vh - 64px);
+  box-sizing: border-box;
 }
 
 .profile-card,
 .form-card {
   background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  padding: 2.5rem;
   max-width: 600px;
   margin: 0 auto;
 }
 
 .profile-card h2,
 .form-card h2 {
-  color: #2c3e50;
+  color: #1a237e;
   margin-bottom: 2rem;
-  font-size: 1.8rem;
+  font-size: 1.6rem;
+  font-weight: 700;
 }
 
 .profile-info {
@@ -27,49 +30,60 @@
 }
 
 .info-group {
-  margin-bottom: 1.5rem;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 1rem;
+  margin-bottom: 0;
+  border-bottom: 1px solid #f0f0f0;
+  padding: 1rem 0;
+}
+
+.info-group:last-child {
+  border-bottom: none;
 }
 
 .info-group label {
   display: block;
-  font-weight: bold;
-  color: #2c3e50;
-  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #37474f;
+  margin-bottom: 0.3rem;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
 }
 
 .info-group p {
-  color: #666;
+  color: #1a237e;
   margin: 0;
-  font-size: 1.1rem;
+  font-size: 1.05rem;
+  font-weight: 500;
 }
 
 .form-group {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.3rem;
 }
 
 .form-group label {
   display: block;
-  margin-bottom: 0.5rem;
-  color: #2c3e50;
-  font-weight: 500;
+  margin-bottom: 0.4rem;
+  color: #37474f;
+  font-weight: 600;
+  font-size: 0.9rem;
 }
 
 .form-group input {
   width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 1rem;
+  padding: 0.7rem 1rem;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 0.95rem;
   box-sizing: border-box;
-  transition: border-color 0.3s;
+  transition: all 0.2s;
+  background: #fafafa;
 }
 
 .form-group input:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 5px rgba(102, 126, 234, 0.1);
+  border-color: #4f6ef7;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(79, 110, 247, 0.08);
 }
 
 .form-group input:disabled {
@@ -85,75 +99,52 @@
 }
 
 .btn {
-  padding: 0.75rem 1.5rem;
+  padding: 0.7rem 1.4rem;
   border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  font-weight: bold;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: all 0.2s;
   text-decoration: none;
   display: inline-block;
 }
 
-.btn-primary {
-  background-color: #667eea;
-  color: white;
-}
-
-.btn-primary:hover:not(:disabled) {
-  background-color: #5568d3;
-}
-
-.btn-secondary {
-  background-color: #95a5a6;
-  color: white;
-}
-
-.btn-secondary:hover:not(:disabled) {
-  background-color: #7f8c8d;
-}
-
-.btn:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
-}
+.btn-primary { background-color: #4f6ef7; color: white; }
+.btn-primary:hover:not(:disabled) { background-color: #3d5af1; box-shadow: 0 2px 8px rgba(79, 110, 247, 0.3); }
+.btn-secondary { background-color: #78909c; color: white; }
+.btn-secondary:hover:not(:disabled) { background-color: #607d8b; }
+.btn:disabled { background-color: #cfd8dc; cursor: not-allowed; color: #90a4ae; }
 
 .error-message {
-  background-color: #f8d7da;
-  border: 1px solid #f5c6cb;
-  color: #721c24;
-  padding: 1rem;
-  border-radius: 4px;
+  background-color: #fce4ec;
+  border: 1px solid #ef9a9a;
+  color: #c62828;
+  padding: 0.85rem 1rem;
+  border-radius: 8px;
   margin-bottom: 1rem;
+  font-size: 0.9rem;
 }
 
 .success-message {
-  background-color: #d4edda;
-  border: 1px solid #c3e6cb;
-  color: #155724;
-  padding: 1rem;
-  border-radius: 4px;
+  background-color: #e8f5e9;
+  border: 1px solid #a5d6a7;
+  color: #2e7d32;
+  padding: 0.85rem 1rem;
+  border-radius: 8px;
   margin-bottom: 1rem;
+  font-size: 0.9rem;
 }
 
 .loading {
   text-align: center;
-  padding: 2rem;
-  font-size: 1.2rem;
-  color: #666;
+  padding: 3rem 2rem;
+  font-size: 1.1rem;
+  color: #90a4ae;
 }
 
 @media (max-width: 768px) {
-  .container {
-    padding: 1rem 15px;
-  }
-
-  .button-group {
-    flex-direction: column;
-  }
-
-  .btn {
-    width: 100%;
-  }
+  .container { padding: 1rem 16px; }
+  .button-group { flex-direction: column; }
+  .btn { width: 100%; }
 }

@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../services/api';
-import './Teacher.css';
+import './Admin.css';
 
-export const ManageQuestions = () => {
+export const AdminManageQuestions = () => {
   const [subjects, setSubjects] = useState([]);
   const [exams, setExams] = useState([]);
   const [filteredExams, setFilteredExams] = useState([]);
@@ -89,10 +89,10 @@ export const ManageQuestions = () => {
 
   return (
     <div className="container">
-      <div className="teacher-card">
+      <div className="admin-card">
         <div className="card-header">
           <h2>Manage Questions</h2>
-          <button onClick={() => navigate('/teacher/questions/create')} className="btn btn-primary">Add New Question</button>
+          <button onClick={() => navigate('/admin/questions/create')} className="btn btn-primary">Add New Question</button>
         </div>
         {error && <div className="error-message">{error}</div>}
 

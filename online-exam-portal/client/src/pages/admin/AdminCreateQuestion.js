@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../services/api';
-import './Teacher.css';
+import './Admin.css';
 
-export const CreateQuestion = () => {
+export const AdminCreateQuestion = () => {
   const [subjects, setSubjects] = useState([]);
   const [exams, setExams] = useState([]);
   const [filteredExams, setFilteredExams] = useState([]);
@@ -109,7 +109,7 @@ export const CreateQuestion = () => {
           { optionText: '', isCorrect: false },
         ],
       });
-      setTimeout(() => navigate('/teacher/questions'), 2000);
+      setTimeout(() => navigate('/admin/questions'), 2000);
     } catch (err) {
       const payload2 = err.response?.data;
       setError(typeof payload2 === 'string' ? payload2 : payload2?.message || 'Failed to create question');
@@ -184,7 +184,7 @@ export const CreateQuestion = () => {
             <button type="submit" disabled={loading} className="btn btn-primary">
               {loading ? 'Creating...' : 'Create Question'}
             </button>
-            <button type="button" onClick={() => navigate('/teacher/questions')} className="btn btn-secondary">Cancel</button>
+            <button type="button" onClick={() => navigate('/admin/questions')} className="btn btn-secondary">Cancel</button>
           </div>
         </form>
       </div>

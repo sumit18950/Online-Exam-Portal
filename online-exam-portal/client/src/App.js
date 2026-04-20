@@ -13,6 +13,11 @@ import { ChangePassword } from './pages/user/ChangePassword';
 import { AdminDashboard } from './pages/admin/AdminDashboard';
 import { ViewAllUsers } from './pages/admin/ViewAllUsers';
 import { CreateUser } from './pages/admin/CreateUser';
+import { AdminManageSubjects } from './pages/admin/AdminManageSubjects';
+import { AdminManageExams } from './pages/admin/AdminManageExams';
+import { AdminManageQuestions } from './pages/admin/AdminManageQuestions';
+import { AdminCreateQuestion } from './pages/admin/AdminCreateQuestion';
+import { AdminResults } from './pages/admin/AdminResults';
 
 import { TeacherDashboard } from './pages/teacher/TeacherDashboard';
 import { ManageSubjects } from './pages/teacher/ManageSubjects';
@@ -51,6 +56,11 @@ function App() {
           <Route path="/admin-dashboard" element={<ProtectedRoute requiredRole="ADMIN"><AdminDashboard /></ProtectedRoute>} />
           <Route path="/admin/users" element={<ProtectedRoute requiredRole="ADMIN"><ViewAllUsers /></ProtectedRoute>} />
           <Route path="/admin/create-user" element={<ProtectedRoute requiredRole="ADMIN"><CreateUser /></ProtectedRoute>} />
+          <Route path="/admin/subjects" element={<ProtectedRoute requiredRole="ADMIN"><AdminManageSubjects /></ProtectedRoute>} />
+          <Route path="/admin/exams" element={<ProtectedRoute requiredRole="ADMIN"><AdminManageExams /></ProtectedRoute>} />
+          <Route path="/admin/questions" element={<ProtectedRoute requiredRole="ADMIN"><AdminManageQuestions /></ProtectedRoute>} />
+          <Route path="/admin/questions/create" element={<ProtectedRoute requiredRole="ADMIN"><AdminCreateQuestion /></ProtectedRoute>} />
+          <Route path="/admin/results" element={<ProtectedRoute requiredRole="ADMIN"><AdminResults /></ProtectedRoute>} />
 
           {/* Teacher Routes */}
           <Route path="/teacher-dashboard" element={<ProtectedRoute requiredRole="TEACHER"><TeacherDashboard /></ProtectedRoute>} />

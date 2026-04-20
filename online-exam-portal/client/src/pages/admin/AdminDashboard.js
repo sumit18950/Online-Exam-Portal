@@ -44,6 +44,22 @@ export const AdminDashboard = () => {
             <h3>Create User</h3>
             <p>Create a new user with a specific role</p>
           </Link>
+          <Link to="/admin/subjects" className="action-card">
+            <h3>Manage Subjects</h3>
+            <p>Create, edit, and delete subjects</p>
+          </Link>
+          <Link to="/admin/exams" className="action-card">
+            <h3>Manage Exams</h3>
+            <p>Create, edit, and manage all exams</p>
+          </Link>
+          <Link to="/admin/questions" className="action-card">
+            <h3>Manage Questions</h3>
+            <p>View, add, and delete questions</p>
+          </Link>
+          <Link to="/admin/results" className="action-card">
+            <h3>View Results</h3>
+            <p>View all student exam results</p>
+          </Link>
           <Link to="/profile" className="action-card">
             <h3>My Profile</h3>
             <p>View and update your profile</p>

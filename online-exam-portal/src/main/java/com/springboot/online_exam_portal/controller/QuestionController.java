@@ -26,6 +26,12 @@ public class QuestionController {
         return questionService.getQuestionsBySubjectId(subjectId);
     }
 
+    // Get all questions by exam ID
+    @GetMapping("/exam/{examId}")
+    public List<Questions> getByExamId(@PathVariable Long examId) {
+        return questionService.getQuestionsByExamId(examId);
+    }
+
     // Get a particular question by subject ID and question ID
     @GetMapping("/subject/{subjectId}/question/{questionId}")
     public ResponseEntity<Questions> getBySubjectIdAndQuestionId(
