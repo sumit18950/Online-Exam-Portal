@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 import { getUserId } from '../../utils/authUtil';
@@ -14,7 +14,81 @@ export const AttemptExam = () => {
   const [error, setError] = useState('');
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [, setEnrolled] = useState(false);
+  const [remainingSeconds, setRemainingSeconds] = useState(null);
+  const timerRef = useRef(null);
+  const autoSubmitRef = useRef(false);
   const navigate = useNavigate();
+
+  const formatTime = (totalSeconds) => {
+    if (totalSeconds == null || totalSeconds < 0) return '--:--:--';
+    const hrs = Math.floor(totalSeconds / 3600);
+    const mins = Math.floor((totalSeconds % 3600) / 60);
+    const secs = totalSeconds % 60;
+    return `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+  };
+
+  const getTimerClass = () => {
+    if (remainingSeconds == null) return 'exam-timer';
+    if (remainingSeconds <= 60) return 'exam-timer timer-critical';
+    if (remainingSeconds <= 300) return 'exam-timer timer-warning';
+    return 'exam-timer';
+  };
+
+  // Auto-submit when time runs out
+  const autoFinishExam = useCallback(async () => {
+    if (autoSubmitRef.current) return;
+    autoSubmitRef.current = true;
+    setSubmitting(true);
+    try {
+      const result = await api.post(`/answers/finish?examId=${examId}&userId=${userId}`);
+      navigate('/student/results', { state: { message: 'Time is up! Exam auto-submitted.', result: result.data } });
+    } catch (err) {
+      const msg = err.response?.data;
+      setError(typeof msg === 'string' ? msg : msg?.message || 'Failed to auto-submit exam');
+      setSubmitting(false);
+      autoSubmitRef.current = false;
+    }
+  }, [examId, userId, navigate]);
+
+  // Fetch remaining time from backend and start countdown
+  const fetchAndStartTimer = useCallback(async () => {
+    try {
+      const res = await api.get(`/exam/timmer/${examId}`);
+      const seconds = typeof res.data === 'number' ? res.data : parseInt(res.data);
+      if (seconds <= 0) {
+        setRemainingSeconds(0);
+        autoFinishExam();
+        return;
+      }
+      setRemainingSeconds(seconds);
+    } catch (err) {
+      console.error('Failed to fetch remaining time:', err);
+    }
+  }, [examId, autoFinishExam]);
+
+  // Countdown timer
+  useEffect(() => {
+    if (remainingSeconds == null || remainingSeconds <= 0) return;
+
+    timerRef.current = setInterval(() => {
+      setRemainingSeconds((prev) => {
+        if (prev <= 1) {
+          clearInterval(timerRef.current);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timerRef.current);
+  }, [remainingSeconds !== null]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Auto-submit when timer hits 0
+  useEffect(() => {
+    if (remainingSeconds === 0 && !autoSubmitRef.current && questions.length > 0) {
+      autoFinishExam();
+    }
+  }, [remainingSeconds, autoFinishExam, questions.length]);
 
   const enrollAndFetchQuestions = useCallback(async () => {
     try {
@@ -58,7 +132,12 @@ export const AttemptExam = () => {
 
   useEffect(() => {
     enrollAndFetchQuestions();
-  }, [enrollAndFetchQuestions]);
+    fetchAndStartTimer();
+
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [enrollAndFetchQuestions, fetchAndStartTimer]);
 
   const handleAnswerChange = (questionId, optionId) => {
     setAnswers((prev) => ({ ...prev, [questionId]: optionId }));
@@ -76,6 +155,7 @@ export const AttemptExam = () => {
   const handleFinish = async () => {
     if (window.confirm('Are you sure you want to finish the exam? This cannot be undone.')) {
       setSubmitting(true);
+      if (timerRef.current) clearInterval(timerRef.current);
       try {
         const result = await api.post(`/answers/finish?examId=${examId}&userId=${userId}`);
         navigate('/student/results', { state: { message: 'Exam submitted successfully!', result: result.data } });
@@ -98,10 +178,17 @@ export const AttemptExam = () => {
       <div className="exam-attempt-card">
         <div className="exam-header">
           <h2>Exam Attempt</h2>
+          <div className={getTimerClass()}>
+            <span className="timer-text">{formatTime(remainingSeconds)}</span>
+          </div>
           <div className="question-counter">
             Question {currentQuestion + 1} of {questions.length}
           </div>
         </div>
+
+        {remainingSeconds !== null && remainingSeconds <= 60 && remainingSeconds > 0 && (
+          <div className="timer-alert">Time is almost up! Your exam will be auto-submitted when the timer ends.</div>
+        )}
 
         {error && <div className="error-message">{error}</div>}
 

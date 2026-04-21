@@ -32,6 +32,20 @@ public class QuestionController {
         return questionService.getQuestionsByExamId(examId);
     }
 
+    // Get a single question by ID
+    @GetMapping("/{questionId}")
+    public ResponseEntity<Questions> getById(@PathVariable Integer questionId) {
+        return ResponseEntity.ok(questionService.getQuestionById(questionId));
+    }
+
+    // Update question by ID
+    @PutMapping("/{questionId}")
+    public ResponseEntity<Questions> updateById(
+            @PathVariable Integer questionId,
+            @RequestBody Questions question) {
+        return ResponseEntity.ok(questionService.updateQuestion(questionId, question));
+    }
+
     // Get a particular question by subject ID and question ID
     @GetMapping("/subject/{subjectId}/question/{questionId}")
     public ResponseEntity<Questions> getBySubjectIdAndQuestionId(

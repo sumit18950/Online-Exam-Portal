@@ -9,7 +9,7 @@ body {
     'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #eef2f7;
+  background-color: #f5f3f0;
   color: #333;
   line-height: 1.6;
 }
@@ -21,7 +21,7 @@ body {
 }
 
 a {
-  color: #4f6ef7;
+  color: #5a5a5a;
   text-decoration: none;
 }
 
@@ -45,14 +45,14 @@ select {
 }
 
 ::-webkit-scrollbar-track {
-  background: #eef2f7;
+  background: #f5f3f0;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #b0bec5;
+  background: #c5c0b8;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #90a4ae;
+  background: #a8a29e;
 }

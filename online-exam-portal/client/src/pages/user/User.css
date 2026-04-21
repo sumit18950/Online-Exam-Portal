@@ -19,7 +19,7 @@
 
 .profile-card h2,
 .form-card h2 {
-  color: #1a237e;
+  color: #2d2d2d;
   margin-bottom: 2rem;
   font-size: 1.6rem;
   font-weight: 700;
@@ -31,7 +31,7 @@
 
 .info-group {
   margin-bottom: 0;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid #ebe6df;
   padding: 1rem 0;
 }
 
@@ -42,7 +42,7 @@
 .info-group label {
   display: block;
   font-weight: 600;
-  color: #37474f;
+  color: #4a4a4a;
   margin-bottom: 0.3rem;
   font-size: 0.85rem;
   text-transform: uppercase;
@@ -50,7 +50,7 @@
 }
 
 .info-group p {
-  color: #1a237e;
+  color: #2d2d2d;
   margin: 0;
   font-size: 1.05rem;
   font-weight: 500;
@@ -63,7 +63,7 @@
 .form-group label {
   display: block;
   margin-bottom: 0.4rem;
-  color: #37474f;
+  color: #4a4a4a;
   font-weight: 600;
   font-size: 0.9rem;
 }
@@ -71,19 +71,19 @@
 .form-group input {
   width: 100%;
   padding: 0.7rem 1rem;
-  border: 1.5px solid #e0e0e0;
+  border: 1.5px solid #ddd8d0;
   border-radius: 8px;
   font-size: 0.95rem;
   box-sizing: border-box;
   transition: all 0.2s;
-  background: #fafafa;
+  background: #faf8f5;
 }
 
 .form-group input:focus {
   outline: none;
-  border-color: #4f6ef7;
+  border-color: #8b8178;
   background: #fff;
-  box-shadow: 0 0 0 3px rgba(79, 110, 247, 0.08);
+  box-shadow: 0 0 0 3px rgba(139, 129, 120, 0.08);
 }
 
 .form-group input:disabled {
@@ -110,11 +110,11 @@
   display: inline-block;
 }
 
-.btn-primary { background-color: #4f6ef7; color: white; }
-.btn-primary:hover:not(:disabled) { background-color: #3d5af1; box-shadow: 0 2px 8px rgba(79, 110, 247, 0.3); }
-.btn-secondary { background-color: #78909c; color: white; }
-.btn-secondary:hover:not(:disabled) { background-color: #607d8b; }
-.btn:disabled { background-color: #cfd8dc; cursor: not-allowed; color: #90a4ae; }
+.btn-primary { background-color: #3d3d3d; color: white; }
+.btn-primary:hover:not(:disabled) { background-color: #2a2a2a; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); }
+.btn-secondary { background-color: #8a8a8a; color: white; }
+.btn-secondary:hover:not(:disabled) { background-color: #7a7a7a; }
+.btn:disabled { background-color: #ccc; cursor: not-allowed; color: #999; }
 
 .error-message {
   background-color: #fce4ec;
@@ -140,7 +140,7 @@
   text-align: center;
   padding: 3rem 2rem;
   font-size: 1.1rem;
-  color: #90a4ae;
+  color: #999;
 }
 
 @media (max-width: 768px) {

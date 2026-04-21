@@ -101,6 +101,6 @@ public class ConductExamServiceImpl implements ConductExamService {
         if(endTime.isBefore(LocalDateTime.now())){
             return 0L;
         }
-        return Duration.between(LocalDateTime.now(),endTime).toMinutes();
+        return Duration.between(LocalDateTime.now(),endTime).toSeconds();
     }
 }

@@ -3,6 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 import './Teacher.css';
 
+const defaultOptions = () => [
+  { optionText: '', isCorrect: true },
+  { optionText: '', isCorrect: false },
+];
+
 export const CreateQuestion = () => {
   const [subjects, setSubjects] = useState([]);
   const [exams, setExams] = useState([]);
@@ -45,8 +50,7 @@ export const CreateQuestion = () => {
     setSelectedSubject(value);
     setSelectedExam('');
     if (value) {
-      const subjectId = parseInt(value);
-      setFilteredExams(exams.filter((e) => e.subjectId === subjectId));
+      setFilteredExams(exams.filter((e) => e.subjectId === parseInt(value)));
     } else {
       setFilteredExams([]);
     }
@@ -69,16 +73,28 @@ export const CreateQuestion = () => {
     });
   };
 
+  const addOption = () => {
+    setFormData((prev) => ({
+      ...prev,
+      options: [...prev.options, { optionText: '', isCorrect: false }],
+    }));
+  };
+
+  const removeOption = (index) => {
+    setFormData((prev) => {
+      const newOptions = prev.options.filter((_, i) => i !== index);
+      if (prev.options[index].isCorrect && newOptions.length > 0) {
+        newOptions[0].isCorrect = true;
+      }
+      return { ...prev, options: newOptions };
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!selectedSubject) {
-      setError('Please select a subject');
-      return;
-    }
-    if (!selectedExam) {
-      setError('Please select an exam');
-      return;
-    }
+    if (!selectedSubject) { setError('Please select a subject'); return; }
+    if (!selectedExam) { setError('Please select an exam'); return; }
+    if (formData.options.length < 2) { setError('At least 2 options are required'); return; }
     setError('');
     setSuccess('');
     setLoading(true);
@@ -99,9 +115,7 @@ export const CreateQuestion = () => {
       await api.post('/api/questions/upload', payload);
       setSuccess('Question created successfully!');
       setFormData({
-        questionText: '',
-        questionType: 'MULTIPLE_CHOICE',
-        marks: 1,
+        questionText: '', questionType: 'MULTIPLE_CHOICE', marks: 1,
         options: [
           { optionText: '', isCorrect: true },
           { optionText: '', isCorrect: false },
@@ -111,8 +125,8 @@ export const CreateQuestion = () => {
       });
       setTimeout(() => navigate('/teacher/questions'), 2000);
     } catch (err) {
-      const payload2 = err.response?.data;
-      setError(typeof payload2 === 'string' ? payload2 : payload2?.message || 'Failed to create question');
+      const p = err.response?.data;
+      setError(typeof p === 'string' ? p : p?.message || 'Failed to create question');
     } finally {
       setLoading(false);
     }
@@ -157,33 +171,23 @@ export const CreateQuestion = () => {
             </div>
           </div>
 
-          <h3 className="section-title">Options</h3>
+          <div className="section-header">
+            <h3 className="section-title">Options</h3>
+            <button type="button" onClick={addOption} className="btn btn-primary btn-small" disabled={loading}>+ Add Option</button>
+          </div>
           {formData.options.map((opt, idx) => (
             <div key={idx} className="option-row">
-              <input
-                type="radio"
-                name="correctOption"
-                checked={opt.isCorrect}
-                onChange={() => handleOptionChange(idx, 'isCorrect', true)}
-                disabled={loading}
-                title="Mark as correct"
-              />
-              <input
-                type="text"
-                placeholder={`Option ${idx + 1}`}
-                value={opt.optionText}
-                onChange={(e) => handleOptionChange(idx, 'optionText', e.target.value)}
-                required
-                disabled={loading}
-              />
+              <input type="radio" name="correctOption" checked={opt.isCorrect} onChange={() => handleOptionChange(idx, 'isCorrect', true)} disabled={loading} title="Mark as correct" />
+              <input type="text" placeholder={`Option ${idx + 1}`} value={opt.optionText} onChange={(e) => handleOptionChange(idx, 'optionText', e.target.value)} required disabled={loading} />
               {opt.isCorrect && <span className="correct-label">Correct</span>}
+              {formData.options.length > 2 && (
+                <button type="button" onClick={() => removeOption(idx)} className="btn-icon btn-icon-danger" disabled={loading} title="Remove option">&times;</button>
+              )}
             </div>
           ))}
 
           <div className="button-group">
-            <button type="submit" disabled={loading} className="btn btn-primary">
-              {loading ? 'Creating...' : 'Create Question'}
-            </button>
+            <button type="submit" disabled={loading} className="btn btn-primary">{loading ? 'Creating...' : 'Create Question'}</button>
             <button type="button" onClick={() => navigate('/teacher/questions')} className="btn btn-secondary">Cancel</button>
           </div>
         </form>
