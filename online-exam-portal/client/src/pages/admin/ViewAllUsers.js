@@ -13,6 +13,7 @@ const getRoleLabel = (roleValue) => {
 
 export const ViewAllUsers = () => {
   const [users, setUsers] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -54,7 +55,16 @@ export const ViewAllUsers = () => {
       <div className="admin-card">
         <div className="card-header">
           <h2>All Users</h2>
-          <button onClick={() => navigate('/admin/create-user')} className="btn btn-primary">Create User</button>
+          <div className="header-actions">
+            <input
+              type="text"
+              className="search-input"
+              placeholder="Search by name, email or role..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <button onClick={() => navigate('/admin/create-user')} className="btn btn-primary">Create User</button>
+          </div>
         </div>
         {error && <div className="error-message">{error}</div>}
         {users.length === 0 ? (
@@ -72,7 +82,16 @@ export const ViewAllUsers = () => {
                 </tr>
               </thead>
               <tbody>
-                {users.map((user) => {
+                {users.filter((user) => {
+                  if (!searchTerm.trim()) return true;
+                  const term = searchTerm.toLowerCase();
+                  const role = getRoleLabel(user.role).toLowerCase();
+                  return (
+                    (user.username || '').toLowerCase().includes(term) ||
+                    (user.email || '').toLowerCase().includes(term) ||
+                    role.includes(term)
+                  );
+                }).map((user) => {
                   const roleLabel = getRoleLabel(user.role);
                   return (
                     <tr key={user.id}>

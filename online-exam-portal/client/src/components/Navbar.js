@@ -51,7 +51,10 @@ export const Navbar = () => {
   return (
     <nav className="navbar">
       <div className="navbar-container">
-        <Link to="/" className="navbar-logo">Online Exam Portal</Link>
+        <Link to="/" className="navbar-logo">
+          <span className="logo-mark">EP</span>
+          ExamPortal
+        </Link>
         <div className="nav-links">
           {isAuthenticated ? (
             <>

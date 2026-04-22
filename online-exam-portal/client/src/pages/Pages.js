@@ -62,6 +62,7 @@ export const Home = () => {
       {/* How It Works */}
       <section className="how-it-works">
         <h2>How It Works</h2>
+        <p className="section-subtitle">Four simple steps to get started with your assessments.</p>
         <div className="steps-grid">
           <div className="step-card">
             <div className="step-number">1</div>
@@ -89,9 +90,9 @@ export const Home = () => {
       {/* Role Highlights */}
       <section className="roles-section">
         <h2>Built for Everyone</h2>
+        <p className="section-subtitle">Tailored experiences for every role in the institution.</p>
         <div className="roles-grid">
           <div className="role-card role-admin-card">
-            <div className="role-icon">A</div>
             <h3>Administrators</h3>
             <ul>
               <li>Manage all users and roles</li>
@@ -101,7 +102,6 @@ export const Home = () => {
             </ul>
           </div>
           <div className="role-card role-teacher-card">
-            <div className="role-icon">T</div>
             <h3>Teachers</h3>
             <ul>
               <li>Create and manage subjects</li>
@@ -111,7 +111,6 @@ export const Home = () => {
             </ul>
           </div>
           <div className="role-card role-student-card">
-            <div className="role-icon">S</div>
             <h3>Students</h3>
             <ul>
               <li>Browse and enroll in exams</li>
@@ -137,7 +136,7 @@ export const Home = () => {
 
       {/* Footer */}
       <footer className="home-footer">
-        <p>Online Exam Portal &mdash; Secure assessments, simplified.</p>
+        <p>ExamPortal &mdash; Secure assessments, simplified.</p>
       </footer>
     </div>
   );

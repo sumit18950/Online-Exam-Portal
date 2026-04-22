@@ -5,12 +5,12 @@
 }
 
 body {
-  font-family: 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans',
-    'Droid Sans', 'Helvetica Neue', sans-serif;
+  font-family: 'Inter', 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell',
+    'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #f5f3f0;
-  color: #333;
+  background-color: #ffffff;
+  color: #1e293b;
   line-height: 1.6;
 }
 
@@ -21,7 +21,7 @@ body {
 }
 
 a {
-  color: #5a5a5a;
+  color: #0d9488;
   text-decoration: none;
 }
 
@@ -39,20 +39,3 @@ select {
   font-family: inherit;
 }
 
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f5f3f0;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #c5c0b8;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #a8a29e;
-}

@@ -161,8 +161,6 @@ export const ManageExams = () => {
                 <label htmlFor="examType">Type</label>
                 <select id="examType" name="examType" value={formData.examType} onChange={handleChange} disabled={submitting}>
                   <option value="MULTIPLE_CHOICE">Multiple Choice</option>
-                  <option value="DESCRIPTIVE">Descriptive</option>
-                  <option value="MIXED">Mixed</option>
                 </select>
               </div>
               <div className="form-group">

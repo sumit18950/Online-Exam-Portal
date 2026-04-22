@@ -1,6 +1,6 @@
 .navbar {
-  background: #2d2d2d;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(135deg, #134e4a 0%, #0f766e 100%);
+  box-shadow: 0 2px 12px rgba(13, 148, 136, 0.15);
   position: sticky;
   top: 0;
   z-index: 1000;
@@ -17,16 +17,32 @@
 }
 
 .navbar-logo {
-  color: #fff;
+  color: #ffffff;
   font-size: 1.35rem;
   font-weight: 700;
   text-decoration: none;
   letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
 }
 
 .navbar-logo:hover {
   text-decoration: none;
-  color: #e8e3db;
+  color: #99f6e4;
+}
+
+.logo-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  margin-right: 10px;
 }
 
 .nav-links {
@@ -36,7 +52,7 @@
 }
 
 .nav-link {
-  color: rgba(255, 255, 255, 0.85);
+  color: rgba(255, 255, 255, 0.88);
   text-decoration: none;
   padding: 8px 14px;
   border-radius: 6px;
@@ -55,7 +71,7 @@
 }
 
 .nav-role-badge {
-  background-color: #8b8178;
+  background-color: #14b8a6;
   color: #fff;
   padding: 4px 12px;
   border-radius: 20px;
@@ -66,14 +82,14 @@
 }
 
 .logout-btn {
-  border: 1.5px solid rgba(200, 80, 80, 0.6) !important;
-  color: #e8a0a0 !important;
+  border: 1.5px solid rgba(239, 83, 80, 0.6) !important;
+  color: #fca5a5 !important;
   margin-left: 4px;
 }
 
 .logout-btn:hover {
-  background-color: #c85050 !important;
-  border-color: #c85050 !important;
+  background-color: #ef4444 !important;
+  border-color: #ef4444 !important;
   color: #fff !important;
 }
 

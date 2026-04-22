@@ -162,7 +162,6 @@ export const CreateQuestion = () => {
               <label htmlFor="questionType">Question Type</label>
               <select id="questionType" name="questionType" value={formData.questionType} onChange={handleChange} disabled={loading}>
                 <option value="MULTIPLE_CHOICE">Multiple Choice</option>
-                <option value="DESCRIPTIVE">Descriptive</option>
               </select>
             </div>
             <div className="form-group">

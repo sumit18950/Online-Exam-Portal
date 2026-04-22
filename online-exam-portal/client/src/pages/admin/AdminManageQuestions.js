@@ -205,7 +205,6 @@ export const AdminManageQuestions = () => {
                         <label>Type</label>
                         <select value={editForm.questionType} onChange={(e) => setEditForm((p) => ({ ...p, questionType: e.target.value }))} disabled={saving}>
                           <option value="MULTIPLE_CHOICE">Multiple Choice</option>
-                          <option value="DESCRIPTIVE">Descriptive</option>
                         </select>
                       </div>
                       <div className="form-group">

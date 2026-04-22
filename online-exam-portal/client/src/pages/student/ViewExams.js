@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../services/api';
+import { getUserId } from '../../utils/authUtil';
 import './Student.css';
 
 export const ViewExams = () => {
   const [exams, setExams] = useState([]);
+  const [attendedExamIds, setAttendedExamIds] = useState(new Set());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -15,9 +17,18 @@ export const ViewExams = () => {
 
   const fetchExams = async () => {
     try {
-      const response = await api.get('/api/exams');
-      const data = Array.isArray(response.data) ? response.data : (response.data?.data || []);
+      const userId = getUserId();
+      const [examsRes, resultsRes] = await Promise.all([
+        api.get('/api/exams'),
+        api.get(`/results/user/${userId}`).catch(() => ({ data: [] })),
+      ]);
+      const data = Array.isArray(examsRes.data) ? examsRes.data : (examsRes.data?.data || []);
       setExams(data);
+
+      const results = Array.isArray(resultsRes.data) ? resultsRes.data : [];
+      const attended = new Set(results.map((r) => r.examId));
+      setAttendedExamIds(attended);
+
       setError('');
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to fetch exams');
@@ -66,13 +77,17 @@ export const ViewExams = () => {
                     <span className={`value status-badge status-${(exam.status || '').toLowerCase()}`}>{exam.status || 'N/A'}</span>
                   </div>
                 </div>
-                <button
-                  onClick={() => navigate(`/student/exams/${exam.id}/attempt`)}
-                  className="btn btn-primary btn-full"
-                  disabled={exam.status === 'COMPLETED'}
-                >
-                  {exam.status === 'COMPLETED' ? 'Exam Completed' : 'Attempt Exam'}
-                </button>
+                {attendedExamIds.has(exam.id) ? (
+                  <span className="btn btn-attended btn-full">Attended</span>
+                ) : (
+                  <button
+                    onClick={() => navigate(`/student/exams/${exam.id}/attempt`)}
+                    className="btn btn-primary btn-full"
+                    disabled={exam.status === 'COMPLETED'}
+                  >
+                    {exam.status === 'COMPLETED' ? 'Exam Completed' : 'Attempt Exam'}
+                  </button>
+                )}
               </div>
             ))}
           </div>
