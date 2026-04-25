@@ -30,6 +30,34 @@
   font-weight: 700;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.search-input {
+  padding: 0.55rem 1rem;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  min-width: 260px;
+  transition: all 0.2s;
+  background: #f8fafc;
+  font-family: inherit;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #0d9488;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.08);
+}
+
+.search-input::placeholder {
+  color: #94a3b8;
+}
+
 /* Dashboard */
 .dashboard-card {
   background: white;

@@ -7,6 +7,7 @@ import './Student.css';
 export const ViewExams = () => {
   const [exams, setExams] = useState([]);
   const [attendedExamIds, setAttendedExamIds] = useState(new Set());
+  const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -42,13 +43,24 @@ export const ViewExams = () => {
   return (
     <div className="container">
       <div className="student-card">
-        <h2>Available Exams</h2>
+        <div className="card-header">
+          <h2>Available Exams</h2>
+          <input type="text" className="search-input" placeholder="Search by title, subject or status..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+        </div>
         {error && <div className="error-message">{error}</div>}
         {exams.length === 0 ? (
           <p className="no-data">No exams available</p>
         ) : (
           <div className="exams-grid">
-            {exams.map((exam) => (
+            {exams.filter((exam) => {
+              if (!searchTerm.trim()) return true;
+              const term = searchTerm.toLowerCase();
+              return (
+                (exam.examTitle || '').toLowerCase().includes(term) ||
+                (exam.subjectName || '').toLowerCase().includes(term) ||
+                (exam.status || '').toLowerCase().includes(term)
+              );
+            }).map((exam) => (
               <div key={exam.id} className="exam-card">
                 <h3>{exam.examTitle}</h3>
                 <div className="exam-details">

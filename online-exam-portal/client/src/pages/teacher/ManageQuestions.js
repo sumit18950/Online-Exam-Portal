@@ -10,6 +10,7 @@ export const ManageQuestions = () => {
   const [selectedSubject, setSelectedSubject] = useState('');
   const [selectedExam, setSelectedExam] = useState('');
   const [questions, setQuestions] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [questionsLoading, setQuestionsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -162,7 +163,10 @@ export const ManageQuestions = () => {
       <div className="teacher-card">
         <div className="card-header">
           <h2>Manage Questions</h2>
-          <button onClick={() => navigate('/teacher/questions/create')} className="btn btn-primary">Add New Question</button>
+          <div className="header-actions">
+            <input type="text" className="search-input" placeholder="Search questions..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+            <button onClick={() => navigate('/teacher/questions/create')} className="btn btn-primary">Add New Question</button>
+          </div>
         </div>
         {error && <div className="error-message">{error}</div>}
         {success && <div className="success-message">{success}</div>}
@@ -192,7 +196,11 @@ export const ManageQuestions = () => {
 
         {!questionsLoading && questions.length > 0 && (
           <div className="questions-list">
-            {questions.map((question) => (
+            {questions.filter((question) => {
+              if (!searchTerm.trim()) return true;
+              const term = searchTerm.toLowerCase();
+              return (question.questionText || '').toLowerCase().includes(term);
+            }).map((question) => (
               <div key={question.id} className="question-item">
                 {editingId === question.id ? (
                   /* ---- EDIT MODE ---- */

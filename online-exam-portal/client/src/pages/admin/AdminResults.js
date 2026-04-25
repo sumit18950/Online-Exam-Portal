@@ -4,6 +4,7 @@ import './Admin.css';
 
 export const AdminResults = () => {
   const [results, setResults] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -29,7 +30,10 @@ export const AdminResults = () => {
   return (
     <div className="container">
       <div className="admin-card">
-        <h2>Student Results</h2>
+        <div className="card-header">
+          <h2>Student Results</h2>
+          <input type="text" className="search-input" placeholder="Search by student, exam or grade..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+        </div>
         {error && <div className="error-message">{error}</div>}
         {results.length === 0 ? (
           <p className="no-data">No results available yet.</p>
@@ -47,7 +51,15 @@ export const AdminResults = () => {
                 </tr>
               </thead>
               <tbody>
-                {results.map((result) => (
+                {results.filter((result) => {
+                  if (!searchTerm.trim()) return true;
+                  const term = searchTerm.toLowerCase();
+                  return (
+                    (result.username || '').toLowerCase().includes(term) ||
+                    (result.examTitle || '').toLowerCase().includes(term) ||
+                    (result.grade || '').toLowerCase().includes(term)
+                  );
+                }).map((result) => (
                   <tr key={result.id}>
                     <td>{result.id}</td>
                     <td>{result.username || `User ${result.userId}`}</td>

@@ -4,6 +4,7 @@ import './Teacher.css';
 
 export const ManageSubjects = () => {
   const [subjects, setSubjects] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -92,9 +93,12 @@ export const ManageSubjects = () => {
       <div className="teacher-card">
         <div className="card-header">
           <h2>Manage Subjects</h2>
-          <button onClick={() => { resetForm(); setShowForm(!showForm); }} className="btn btn-primary">
-            {showForm ? 'Cancel' : 'Add Subject'}
-          </button>
+          <div className="header-actions">
+            <input type="text" className="search-input" placeholder="Search by name or description..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+            <button onClick={() => { resetForm(); setShowForm(!showForm); }} className="btn btn-primary">
+              {showForm ? 'Cancel' : 'Add Subject'}
+            </button>
+          </div>
         </div>
 
         {error && <div className="error-message">{error}</div>}
@@ -133,7 +137,14 @@ export const ManageSubjects = () => {
                 </tr>
               </thead>
               <tbody>
-                {subjects.map((subject) => (
+                {subjects.filter((subject) => {
+                  if (!searchTerm.trim()) return true;
+                  const term = searchTerm.toLowerCase();
+                  return (
+                    (subject.subjectName || '').toLowerCase().includes(term) ||
+                    (subject.description || '').toLowerCase().includes(term)
+                  );
+                }).map((subject) => (
                   <tr key={subject.id}>
                     <td>{subject.id}</td>
                     <td>{subject.subjectName}</td>

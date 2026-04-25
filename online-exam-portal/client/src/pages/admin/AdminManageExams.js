@@ -7,6 +7,7 @@ export const AdminManageExams = () => {
   const { user } = useContext(AuthContext);
   const [exams, setExams] = useState([]);
   const [subjects, setSubjects] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -119,9 +120,12 @@ export const AdminManageExams = () => {
       <div className="admin-card">
         <div className="card-header">
           <h2>Manage Exams</h2>
-          <button onClick={() => { resetForm(); setShowForm(!showForm); }} className="btn btn-primary">
-            {showForm ? 'Cancel' : 'Create Exam'}
-          </button>
+          <div className="header-actions">
+            <input type="text" className="search-input" placeholder="Search by title, subject or status..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+            <button onClick={() => { resetForm(); setShowForm(!showForm); }} className="btn btn-primary">
+              {showForm ? 'Cancel' : 'Create Exam'}
+            </button>
+          </div>
         </div>
 
         {error && <div className="error-message">{error}</div>}
@@ -199,7 +203,15 @@ export const AdminManageExams = () => {
                 </tr>
               </thead>
               <tbody>
-                {exams.map((exam) => (
+                {exams.filter((exam) => {
+                  if (!searchTerm.trim()) return true;
+                  const term = searchTerm.toLowerCase();
+                  return (
+                    (exam.examTitle || '').toLowerCase().includes(term) ||
+                    (exam.subjectName || '').toLowerCase().includes(term) ||
+                    (exam.status || '').toLowerCase().includes(term)
+                  );
+                }).map((exam) => (
                   <tr key={exam.id}>
                     <td>{exam.id}</td>
                     <td>{exam.examTitle}</td>

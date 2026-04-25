@@ -1,14 +1,16 @@
 import { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 import { getUserId } from '../../utils/authUtil';
 import './Student.css';
 
 export const ViewResults = () => {
   const [results, setResults] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const location = useLocation();
+  const navigate = useNavigate();
   const successMessage = location.state?.message || '';
 
   useEffect(() => {
@@ -38,15 +40,25 @@ export const ViewResults = () => {
   return (
     <div className="container">
       <div className="student-card">
-        <h2>My Results</h2>
+        <div className="card-header">
+          <h2>My Results</h2>
+          <input type="text" className="search-input" placeholder="Search by exam or grade..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+        </div>
         {successMessage && <div className="success-message">{successMessage}</div>}
         {error && <div className="error-message">{error}</div>}
         {results.length === 0 ? (
           <p className="no-data">No results available yet.</p>
         ) : (
           <div className="results-grid">
-            {results.map((result) => (
-              <div key={result.id} className="result-card">
+            {results.filter((result) => {
+              if (!searchTerm.trim()) return true;
+              const term = searchTerm.toLowerCase();
+              return (
+                (result.examTitle || '').toLowerCase().includes(term) ||
+                (result.grade || '').toLowerCase().includes(term)
+              );
+            }).map((result) => (
+              <div key={result.id} className="result-card result-card-clickable" onClick={() => navigate(`/student/results/${result.examId}/feedback`)}>
                 <h3>{result.examTitle || `Exam ${result.examId}`}</h3>
                 <div className="result-details">
                   <div className="detail-item">
@@ -66,6 +78,7 @@ export const ViewResults = () => {
                     </span>
                   </div>
                 </div>
+                <div className="result-card-hint">Click to view detailed feedback</div>
               </div>
             ))}
           </div>
