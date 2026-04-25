@@ -145,8 +145,8 @@ public class AnswerServiceImpl implements AnswerService {
                 ExamFeedbackDTO.OptionFeedback of = new ExamFeedbackDTO.OptionFeedback();
                 of.setOptionId(opt.getId().longValue());
                 of.setOptionText(opt.getOptionText());
-                of.setIsCorrect(opt.getIsCorrect() != null && opt.getIsCorrect());
-                if (of.getIsCorrect()) {
+                of.setCorrect(opt.getIsCorrect() != null && opt.getIsCorrect());
+                if (of.isCorrect()) {
                     correctOptionId = opt.getId().longValue();
                 }
                 optionFeedbacks.add(of);
@@ -155,7 +155,7 @@ public class AnswerServiceImpl implements AnswerService {
             qf.setCorrectOptionId(correctOptionId);
 
             boolean isCorrect = selectedOptionId != null && selectedOptionId.equals(correctOptionId);
-            qf.setIsCorrect(isCorrect);
+            qf.setCorrect(isCorrect);
             if (isCorrect) {
                 obtainedScore += qf.getMarks();
             }

@@ -37,5 +37,10 @@ input,
 textarea,
 select {
   font-family: inherit;
+  caret-color: auto;
+}
+
+div, section, main, header, footer, nav, p, h1, h2, h3, h4, h5, h6, span {
+  caret-color: transparent;
 }
 

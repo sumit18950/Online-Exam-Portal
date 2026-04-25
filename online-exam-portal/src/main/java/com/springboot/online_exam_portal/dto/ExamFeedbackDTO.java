@@ -1,5 +1,6 @@
 package com.springboot.online_exam_portal.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.util.List;
@@ -21,7 +22,8 @@ public class ExamFeedbackDTO {
         private int marks;
         private Long selectedOptionId;
         private Long correctOptionId;
-        private boolean isCorrect;
+        @JsonProperty("isCorrect")
+        private boolean correct;
         private List<OptionFeedback> options;
     }
 
@@ -29,6 +31,7 @@ public class ExamFeedbackDTO {
     public static class OptionFeedback {
         private Long optionId;
         private String optionText;
-        private boolean isCorrect;
+        @JsonProperty("isCorrect")
+        private boolean correct;
     }
 }
