@@ -6,7 +6,8 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.event.ContextClosedEvent;
 
 @SpringBootApplication
-public class ExamPortalApplication {
+public class
+ExamPortalApplication {
 
 	public static void main(String[] args) {
 

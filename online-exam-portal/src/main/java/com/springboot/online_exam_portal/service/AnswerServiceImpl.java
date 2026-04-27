@@ -98,7 +98,6 @@ public class AnswerServiceImpl implements AnswerService {
         result.setScore(score);
         result.setGrade(grade);
         result.setEvaluatedAt(LocalDateTime.now());
-
         return resultRepo.save(result);
     }
 
