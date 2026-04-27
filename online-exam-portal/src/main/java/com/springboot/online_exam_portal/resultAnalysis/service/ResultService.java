@@ -22,6 +22,5 @@ public interface ResultService {
 
     ResultCertificateDTO getCertificate(Long resultId);
 
-    byte[] exportResultsByExam(Long examId);
 
 }

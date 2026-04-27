@@ -2,46 +2,41 @@ import { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import { Layers, BookOpen, FileText, BarChart, User } from '../../components/Icons';
+import { Card } from '../../components/ui';
+import { RoleSidebar } from '../../components/RoleSidebar';
 import './Teacher.css';
 
 export const TeacherDashboard = () => {
   const { user } = useContext(AuthContext);
 
-  return (
-    <div className="container">
-      <div className="dashboard-card">
-        <h2>Teacher Dashboard</h2>
-        <p className="welcome-msg">Welcome, {user?.username || 'Teacher'}!</p>
-        <p className="role-label">Role: TEACHER</p>
+  const cards = [
+    { to: '/teacher/subjects', title: 'Manage Subjects', desc: 'Add, edit, or delete subjects', icon: Layers },
+    { to: '/teacher/exams', title: 'Manage Exams', desc: 'Create and manage exams', icon: BookOpen },
+    { to: '/teacher/questions', title: 'Manage Questions', desc: 'Create, update, and delete questions', icon: FileText },
+    { to: '/teacher/results', title: 'View Results', desc: 'View student exam results', icon: BarChart },
+    { to: '/profile', title: 'My Profile', desc: 'View and update your profile', icon: User },
+  ];
 
-        <div className="dashboard-actions">
-          <Link to="/teacher/subjects" className="action-card">
-            <span className="action-icon"><Layers style={{ width: '1.3rem', height: '1.3rem', fill: 'currentColor' }} /></span>
-            <h3>Manage Subjects</h3>
-            <p>Add, edit, or delete subjects</p>
-          </Link>
-          <Link to="/teacher/exams" className="action-card">
-            <span className="action-icon"><BookOpen style={{ width: '1.3rem', height: '1.3rem', fill: 'currentColor' }} /></span>
-            <h3>Manage Exams</h3>
-            <p>Create and manage exams</p>
-          </Link>
-          <Link to="/teacher/questions" className="action-card">
-            <span className="action-icon"><FileText style={{ width: '1.3rem', height: '1.3rem', fill: 'currentColor' }} /></span>
-            <h3>Manage Questions</h3>
-            <p>Create, update, and delete questions</p>
-          </Link>
-          <Link to="/teacher/results" className="action-card">
-            <span className="action-icon"><BarChart style={{ width: '1.3rem', height: '1.3rem', fill: 'currentColor' }} /></span>
-            <h3>View Results</h3>
-            <p>View student exam results</p>
-          </Link>
-          <Link to="/profile" className="action-card">
-            <span className="action-icon"><User style={{ width: '1.3rem', height: '1.3rem', fill: 'currentColor' }} /></span>
-            <h3>My Profile</h3>
-            <p>View and update your profile</p>
-          </Link>
-        </div>
-      </div>
+  return (
+    <div className="role-layout">
+      <RoleSidebar role="TEACHER" />
+
+      <main className="role-main">
+        <Card title="Teacher Dashboard" subtitle={`Welcome, ${user?.username || 'Teacher'}`}>
+          <div className="dashboard-actions">
+            {cards.map((card) => {
+              const Icon = card.icon;
+              return (
+                <Link to={card.to} className="action-card" key={card.to}>
+                  <span className="action-icon"><Icon style={{ width: '1.2rem', height: '1.2rem', fill: 'currentColor' }} /></span>
+                  <h3>{card.title}</h3>
+                  <p>{card.desc}</p>
+                </Link>
+              );
+            })}
+          </div>
+        </Card>
+      </main>
     </div>
   );
 };

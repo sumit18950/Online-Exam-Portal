@@ -33,6 +33,8 @@ import { ViewResults } from './pages/student/ViewResults';
 
 import { Home, Unauthorized, NotFound } from './pages/Pages';
 
+import './components/ui/UI.css';
+import './components/RoleSidebar.css';
 import './App.css';
 
 function App() {

@@ -1,5 +1,8 @@
 package com.springboot.online_exam_portal.resultAnalysis.dto;
 
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.Data;
 
 import java.time.LocalDateTime;

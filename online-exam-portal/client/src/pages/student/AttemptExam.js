@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 import { getUserId } from '../../utils/authUtil';
+import { Alert, Button, Loader } from '../../components/ui';
 import './Student.css';
 
 export const AttemptExam = () => {
@@ -167,8 +168,8 @@ export const AttemptExam = () => {
     }
   };
 
-  if (loading) return <div className="container"><div className="loading">Loading exam...</div></div>;
-  if (error && questions.length === 0) return <div className="container"><div className="error-message">{error}</div></div>;
+  if (loading) return <div className="container"><Loader text="Loading exam..." /></div>;
+  if (error && questions.length === 0) return <div className="container"><Alert type="error">{error}</Alert></div>;
   if (questions.length === 0) return <div className="container"><p className="no-data">No questions found for this exam.</p></div>;
 
   const question = questions[currentQuestion];
@@ -186,11 +187,15 @@ export const AttemptExam = () => {
           </div>
         </div>
 
+        <div className="exam-progress-wrap">
+          <div className="exam-progress-bar" style={{ width: `${((currentQuestion + 1) / questions.length) * 100}%` }} />
+        </div>
+
         {remainingSeconds !== null && remainingSeconds <= 60 && remainingSeconds > 0 && (
           <div className="timer-alert">Time is almost up! Your exam will be auto-submitted when the timer ends.</div>
         )}
 
-        {error && <div className="error-message">{error}</div>}
+        <Alert type="error">{error}</Alert>
 
         <div className="question-section">
           <h3>{question.questionText}</h3>
@@ -213,28 +218,27 @@ export const AttemptExam = () => {
         </div>
 
         <div className="navigation-buttons">
-          <button
+          <Button
             onClick={() => setCurrentQuestion(Math.max(0, currentQuestion - 1))}
             disabled={currentQuestion === 0 || submitting}
-            className="btn btn-secondary"
+            variant="secondary"
           >
             Previous
-          </button>
+          </Button>
           <span className="question-status">
             {Object.values(answers).filter((a) => a !== null).length} / {questions.length} answered
           </span>
           {currentQuestion === questions.length - 1 ? (
-            <button onClick={handleFinish} disabled={submitting} className="btn btn-success">
+            <Button onClick={handleFinish} disabled={submitting}>
               {submitting ? 'Submitting...' : 'Finish Exam'}
-            </button>
+            </Button>
           ) : (
-            <button
+            <Button
               onClick={() => setCurrentQuestion(Math.min(questions.length - 1, currentQuestion + 1))}
               disabled={submitting}
-              className="btn btn-primary"
             >
               Next
-            </button>
+            </Button>
           )}
         </div>
 

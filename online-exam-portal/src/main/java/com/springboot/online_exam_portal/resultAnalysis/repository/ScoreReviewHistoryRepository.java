@@ -9,6 +9,5 @@ import java.util.List;
 public interface ScoreReviewHistoryRepository
         extends JpaRepository<ScoreReviewHistory, Long> {
 
-   // ResultResponseDTO reviewResult(ResultReviewRequestDTO request);
     List<ScoreReviewHistory> findByResultId(Long resultId);
 }

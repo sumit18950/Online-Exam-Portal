@@ -1,76 +1,76 @@
 import { useContext } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import './Navbar.css';
+
+const roleLinks = {
+  ADMIN: [
+    { to: '/admin-dashboard', label: 'Dashboard' },
+    { to: '/admin/users', label: 'Users' },
+    { to: '/admin/exams', label: 'Exams' },
+    { to: '/admin/results', label: 'Results' },
+  ],
+  TEACHER: [
+    { to: '/teacher-dashboard', label: 'Dashboard' },
+    { to: '/teacher/exams', label: 'Exams' },
+    { to: '/teacher/questions', label: 'Questions' },
+    { to: '/teacher/results', label: 'Results' },
+  ],
+  STUDENT: [
+    { to: '/student-dashboard', label: 'Dashboard' },
+    { to: '/student/exams', label: 'Exams' },
+    { to: '/student/results', label: 'Results' },
+  ],
+};
 
 export const Navbar = () => {
   const { isAuthenticated, role, logout } = useContext(AuthContext);
   const navigate = useNavigate();
+  const links = roleLinks[role] || [];
 
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
 
-  const renderRoleLinks = () => {
-    switch (role) {
-      case 'ADMIN':
-        return (
-          <>
-            <Link to="/admin-dashboard" className="nav-link">Dashboard</Link>
-            <Link to="/admin/users" className="nav-link">Users</Link>
-            <Link to="/admin/subjects" className="nav-link">Subjects</Link>
-            <Link to="/admin/exams" className="nav-link">Exams</Link>
-            <Link to="/admin/questions" className="nav-link">Questions</Link>
-            <Link to="/admin/results" className="nav-link">Results</Link>
-          </>
-        );
-      case 'TEACHER':
-        return (
-          <>
-            <Link to="/teacher-dashboard" className="nav-link">Dashboard</Link>
-            <Link to="/teacher/subjects" className="nav-link">Subjects</Link>
-            <Link to="/teacher/exams" className="nav-link">Exams</Link>
-            <Link to="/teacher/questions" className="nav-link">Questions</Link>
-            <Link to="/teacher/results" className="nav-link">Results</Link>
-          </>
-        );
-      case 'STUDENT':
-        return (
-          <>
-            <Link to="/student-dashboard" className="nav-link">Dashboard</Link>
-            <Link to="/student/exams" className="nav-link">View Exams</Link>
-            <Link to="/student/results" className="nav-link">My Results</Link>
-          </>
-        );
-      default:
-        return null;
-    }
-  };
-
   return (
-    <nav className="navbar">
+    <header className="navbar">
       <div className="navbar-container">
-        <Link to="/" className="navbar-logo">
+        <Link to="/" className="navbar-logo" aria-label="Exam Portal home">
           <span className="logo-mark">EP</span>
-          ExamPortal
+          Exam Portal
         </Link>
-        <div className="nav-links">
+
+        <nav className="nav-links" aria-label="Primary navigation">
           {isAuthenticated ? (
             <>
-              {renderRoleLinks()}
-              <Link to="/profile" className="nav-link">Profile</Link>
+              {links.map((item) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+                >
+                  {item.label}
+                </NavLink>
+              ))}
+              <NavLink to="/profile" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                Profile
+              </NavLink>
               <span className="nav-role-badge">{role}</span>
               <button onClick={handleLogout} className="nav-link logout-btn">Logout</button>
             </>
           ) : (
             <>
-              <Link to="/login" className="nav-link">Login</Link>
-              <Link to="/register" className="nav-link">Register</Link>
+              <NavLink to="/login" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                Login
+              </NavLink>
+              <NavLink to="/register" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                Register
+              </NavLink>
             </>
           )}
-        </div>
+        </nav>
       </div>
-    </nav>
+    </header>
   );
 };

@@ -83,23 +83,6 @@ public class ResultController {
         return ResponseEntity.ok(resultService.getCertificate(resultId));
     }
 
-    @GetMapping("/export/exam/{examId}")
-    public ResponseEntity<byte[]> exportResults(
-            @PathVariable Long examId) {
 
-        byte[] data =
-                resultService.exportResultsByExam(examId);
 
-        return ResponseEntity
-                .ok()
-                .header(
-                        "Content-Disposition",
-                        "attachment; filename=results.csv"
-                )
-                .header(
-                        "Content-Type",
-                        "text/csv"
-                )
-                .body(data);
-    }
 }

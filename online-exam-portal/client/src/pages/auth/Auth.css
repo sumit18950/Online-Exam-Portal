@@ -109,3 +109,73 @@
 .form-footer a:hover {
   text-decoration: underline;
 }
+
+.auth-layout {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem 40px;
+  display: grid;
+  grid-template-columns: 1fr minmax(320px, 460px);
+  gap: 1.2rem;
+  align-items: stretch;
+  min-height: calc(100vh - 80px);
+}
+
+.auth-aside {
+  border-radius: 18px;
+  background: linear-gradient(145deg, #0f172a, #1e293b);
+  padding: 2rem;
+  color: #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.auth-aside img {
+  width: 140px;
+  margin-bottom: 1rem;
+  filter: drop-shadow(0 5px 20px rgba(45, 212, 191, 0.25));
+}
+
+.auth-aside h2 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 1.8rem;
+}
+
+.auth-aside p {
+  margin-top: 0.8rem;
+  color: #cbd5e1;
+  max-width: 480px;
+}
+
+.auth-form-card {
+  align-self: center;
+}
+
+.auth-form-card form {
+  margin-top: 0.5rem;
+}
+
+.auth-footer-text {
+  text-align: center;
+  margin-top: 1rem;
+  color: #64748b;
+  font-size: 0.93rem;
+}
+
+@media (max-width: 900px) {
+  .auth-layout {
+    grid-template-columns: 1fr;
+    padding: 1rem 16px;
+    min-height: auto;
+  }
+
+  .auth-aside {
+    padding: 1.4rem;
+  }
+
+  .auth-aside h2 {
+    font-size: 1.5rem;
+  }
+}

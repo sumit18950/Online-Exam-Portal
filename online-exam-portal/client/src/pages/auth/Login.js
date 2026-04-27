@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 import { storeToken, storeUserData, extractRole } from '../../utils/authUtil';
 import { AuthContext } from '../../context/AuthContext';
+import { Alert, Button, Card, FormField } from '../../components/ui';
+import logo from '../../logo.svg';
 import './Auth.css';
 
 export const Login = () => {
@@ -19,13 +21,22 @@ export const Login = () => {
     return payload?.message || payload?.error || err.message || fallback;
   };
 
+  const validateForm = () => {
+    if (!email.trim() || !password.trim()) {
+      setError('Please enter email and password.');
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    setLoading(true);
+    if (!validateForm()) return;
 
+    setLoading(true);
     try {
-      // Step 1: Login and get JWT token
+      // Step 1: Login and get token
       const response = await api.post('/api/auth/login', { email, password });
       const token = typeof response.data === 'string'
         ? response.data
@@ -37,7 +48,7 @@ export const Login = () => {
 
       storeToken(token);
 
-      // Step 2: Fetch user profile to get role (JWT only contains email)
+      // Step 2: Fetch profile (backend keeps role in profile response)
       const profileResponse = await api.get('/api/users/profile');
       const userData = profileResponse.data;
       storeUserData(userData);
@@ -45,16 +56,13 @@ export const Login = () => {
       const role = extractRole(userData.role);
       login(token, { id: userData.id, username: userData.username, email: userData.email, role: userData.role });
 
-      // Step 3: Redirect to role-based dashboard
-      switch (role) {
-        case 'ADMIN':
-          navigate('/admin-dashboard');
-          break;
-        case 'TEACHER':
-          navigate('/teacher-dashboard');
-          break;
-        default:
-          navigate('/student-dashboard');
+      // Step 3: Redirect by role
+      if (role === 'ADMIN') {
+        navigate('/admin-dashboard');
+      } else if (role === 'TEACHER') {
+        navigate('/teacher-dashboard');
+      } else {
+        navigate('/student-dashboard');
       }
     } catch (err) {
       setError(getErrorMessage(err, 'Login failed. Please check your credentials.'));
@@ -64,13 +72,17 @@ export const Login = () => {
   };
 
   return (
-    <div className="auth-container">
-      <div className="auth-card">
-        <h2>Login</h2>
-        {error && <div className="error-message">{error}</div>}
+    <div className="auth-layout">
+      <section className="auth-aside">
+        <img src={logo} alt="Exam portal" />
+        <h2>Welcome back</h2>
+        <p>Sign in to continue your exam workflow with role-based access and secure sessions.</p>
+      </section>
+
+      <Card className="auth-form-card" title="Login" subtitle="Enter your credentials to continue.">
+        <Alert type="error">{error}</Alert>
         <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="email">Email</label>
+          <FormField id="email" label="Email">
             <input
               type="email"
               id="email"
@@ -78,10 +90,11 @@ export const Login = () => {
               onChange={(e) => setEmail(e.target.value)}
               required
               disabled={loading}
+              placeholder="you@example.com"
             />
-          </div>
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
+          </FormField>
+
+          <FormField id="password" label="Password">
             <input
               type="password"
               id="password"
@@ -89,16 +102,19 @@ export const Login = () => {
               onChange={(e) => setPassword(e.target.value)}
               required
               disabled={loading}
+              placeholder="Enter password"
             />
-          </div>
-          <button type="submit" disabled={loading} className="submit-btn">
+          </FormField>
+
+          <Button type="submit" fullWidth disabled={loading}>
             {loading ? 'Logging in...' : 'Login'}
-          </button>
+          </Button>
         </form>
-        <p className="form-footer">
-          Don't have an account? <Link to="/register">Register here</Link>
+
+        <p className="auth-footer-text">
+          Do not have an account? <Link to="/register">Create one</Link>
         </p>
-      </div>
+      </Card>
     </div>
   );
 };

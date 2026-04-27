@@ -1,6 +1,8 @@
 import { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import { Award, BookOpen, Shield, Users } from '../components/Icons';
+import logo from '../logo.svg';
 import './Pages.css';
 
 export const Home = () => {
@@ -8,135 +10,87 @@ export const Home = () => {
 
   const getDashboardLink = () => {
     switch (role) {
-      case 'ADMIN': return '/admin-dashboard';
-      case 'TEACHER': return '/teacher-dashboard';
-      case 'STUDENT': return '/student-dashboard';
-      default: return '/login';
+      case 'ADMIN':
+        return '/admin-dashboard';
+      case 'TEACHER':
+        return '/teacher-dashboard';
+      case 'STUDENT':
+        return '/student-dashboard';
+      default:
+        return '/login';
     }
   };
 
+  const features = [
+    { title: 'Secure by Default', text: 'JWT auth, role-based access, and protected exam flow.', icon: Shield },
+    { title: 'Fast Exam Creation', text: 'Create subjects, exams, and questions in minutes.', icon: BookOpen },
+    { title: 'Smart Results', text: 'Get scores, grades, and leaderboards with clear insights.', icon: Award },
+    { title: 'Multi-Role Support', text: 'Admin, Teacher, and Student workspaces in one portal.', icon: Users },
+  ];
+
   return (
     <div className="home-page">
-      {/* Hero Section */}
-      <section className="hero-section">
-        <div className="hero-content">
-          <span className="hero-badge">Trusted Online Assessment Platform</span>
-          <h1>Conduct Exams with<br />Confidence & Ease</h1>
-          <p className="hero-subtitle">
-            A secure, reliable platform for creating, managing, and taking online examinations.
-            Built for institutions, teachers, and students.
+      <section className="home-hero">
+        <div>
+          <p className="home-badge">Online Exam Management Platform</p>
+          <h1>Run assessments with a modern, reliable exam portal</h1>
+          <p className="home-copy">
+            Manage exams end-to-end: onboarding, exam setup, timed attempts, and result analytics.
+            Designed for schools, institutes, and training teams.
           </p>
-          <div className="hero-actions">
+          <div className="home-actions">
             {isAuthenticated ? (
-              <Link to={getDashboardLink()} className="btn-hero btn-hero-primary">Go to Dashboard</Link>
+              <Link to={getDashboardLink()} className="ui-btn ui-btn-primary">Go to Dashboard</Link>
             ) : (
               <>
-                <Link to="/login" className="btn-hero btn-hero-primary">Get Started</Link>
-                <Link to="/register" className="btn-hero btn-hero-outline">Create Account</Link>
+                <Link to="/login" className="ui-btn ui-btn-primary">Get Started</Link>
+                <Link to="/register" className="ui-btn ui-btn-ghost">Create Account</Link>
               </>
             )}
           </div>
-        </div>
-        <div className="hero-visual">
-          <div className="hero-stat-grid">
-            <div className="hero-stat-card">
-              <div className="hero-stat-number">100%</div>
-              <div className="hero-stat-label">Secure</div>
-            </div>
-            <div className="hero-stat-card accent">
-              <div className="hero-stat-number">24/7</div>
-              <div className="hero-stat-label">Available</div>
-            </div>
-            <div className="hero-stat-card accent">
-              <div className="hero-stat-number">Live</div>
-              <div className="hero-stat-label">Timer</div>
-            </div>
-            <div className="hero-stat-card">
-              <div className="hero-stat-number">Auto</div>
-              <div className="hero-stat-label">Grading</div>
-            </div>
+
+          <div className="home-stats">
+            <div><strong>99.9%</strong><span>Uptime</span></div>
+            <div><strong>3 Roles</strong><span>Admin / Teacher / Student</span></div>
+            <div><strong>Real-time</strong><span>Timer + Auto Submit</span></div>
           </div>
+        </div>
+
+        <div className="hero-art" aria-hidden="true">
+          <img src={logo} alt="Online exam portal illustration" />
         </div>
       </section>
 
-      {/* How It Works */}
-      <section className="how-it-works">
-        <h2>How It Works</h2>
-        <p className="section-subtitle">Four simple steps to get started with your assessments.</p>
-        <div className="steps-grid">
-          <div className="step-card">
-            <div className="step-number">1</div>
-            <h3>Create an Account</h3>
-            <p>Register as an admin, teacher, or student to access your personalized dashboard.</p>
-          </div>
-          <div className="step-card">
-            <div className="step-number">2</div>
-            <h3>Set Up Exams</h3>
-            <p>Teachers create subjects, schedule exams, and add questions with multiple options.</p>
-          </div>
-          <div className="step-card">
-            <div className="step-number">3</div>
-            <h3>Take the Exam</h3>
-            <p>Students attempt exams within the scheduled time with a live countdown timer.</p>
-          </div>
-          <div className="step-card">
-            <div className="step-number">4</div>
-            <h3>View Results</h3>
-            <p>Get instant results with scores, grades, and detailed performance analysis.</p>
-          </div>
+      <section className="home-section">
+        <h2>Everything you need in one place</h2>
+        <p className="section-subtitle">Simple UI for daily use, strong enough for real exam workflows.</p>
+        <div className="feature-grid">
+          {features.map((item) => {
+            const Icon = item.icon;
+            return (
+              <article key={item.title} className="feature-card">
+                <span className="feature-icon"><Icon /></span>
+                <h3>{item.title}</h3>
+                <p>{item.text}</p>
+              </article>
+            );
+          })}
         </div>
       </section>
 
-      {/* Role Highlights */}
-      <section className="roles-section">
-        <h2>Built for Everyone</h2>
-        <p className="section-subtitle">Tailored experiences for every role in the institution.</p>
-        <div className="roles-grid">
-          <div className="role-card role-admin-card">
-            <h3>Administrators</h3>
-            <ul>
-              <li>Manage all users and roles</li>
-              <li>Full control over subjects and exams</li>
-              <li>View all results and analytics</li>
-              <li>Create and edit questions</li>
-            </ul>
-          </div>
-          <div className="role-card role-teacher-card">
-            <h3>Teachers</h3>
-            <ul>
-              <li>Create and manage subjects</li>
-              <li>Schedule exams with custom duration</li>
-              <li>Add, edit, and organize questions</li>
-              <li>Review student performance</li>
-            </ul>
-          </div>
-          <div className="role-card role-student-card">
-            <h3>Students</h3>
-            <ul>
-              <li>Browse and enroll in exams</li>
-              <li>Timed exam attempts with auto-submit</li>
-              <li>Real-time answer saving</li>
-              <li>Instant results and grade reports</li>
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
       {!isAuthenticated && (
-        <section className="cta-section">
-          <h2>Ready to Get Started?</h2>
-          <p>Join the platform and start your assessment journey today.</p>
-          <div className="hero-actions">
-            <Link to="/register" className="btn-hero btn-hero-primary">Create Free Account</Link>
-            <Link to="/login" className="btn-hero btn-hero-outline">Sign In</Link>
+        <section className="home-cta">
+          <h2>Ready to modernize your exam process?</h2>
+          <p>Start now and move from manual coordination to a structured online workflow.</p>
+          <div className="home-actions">
+            <Link to="/register" className="ui-btn ui-btn-primary">Create Free Account</Link>
+            <Link to="/login" className="ui-btn ui-btn-secondary">Sign In</Link>
           </div>
         </section>
       )}
 
-      {/* Footer */}
       <footer className="home-footer">
-        <p>ExamPortal &mdash; Secure assessments, simplified.</p>
+        <p>Exam Portal - secure assessments, clear outcomes.</p>
       </footer>
     </div>
   );
@@ -144,11 +98,11 @@ export const Home = () => {
 
 export const Unauthorized = () => {
   return (
-    <div className="container">
-      <div className="error-card">
+    <div className="simple-page-wrap">
+      <div className="simple-page-card">
         <h1>Access Denied</h1>
-        <p>You do not have permission to access this page.</p>
-        <a href="/" className="btn btn-primary">Go to Home</a>
+        <p>You do not have permission to view this page.</p>
+        <Link to="/" className="ui-btn ui-btn-primary">Go Home</Link>
       </div>
     </div>
   );
@@ -156,11 +110,11 @@ export const Unauthorized = () => {
 
 export const NotFound = () => {
   return (
-    <div className="container">
-      <div className="error-card">
+    <div className="simple-page-wrap">
+      <div className="simple-page-card">
         <h1>404 - Page Not Found</h1>
-        <p>The page you are looking for does not exist.</p>
-        <a href="/" className="btn btn-primary">Go to Home</a>
+        <p>The page you requested does not exist.</p>
+        <Link to="/" className="ui-btn ui-btn-primary">Go Home</Link>
       </div>
     </div>
   );

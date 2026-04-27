@@ -227,30 +227,22 @@ public class ResultServiceImpl implements ResultService {
 
 //        Exams exam =
 //                examsRepository.findById(result.getExamId()).orElse(null);
-
         Integer examId = result.getExamId() == null ? null : Math.toIntExact(result.getExamId());
         Exams exam = examId == null ? null : examsRepository.findById(examId).orElseThrow(()->new RuntimeException("Exam not found"));
 
-
         ResultCertificateDTO dto = new ResultCertificateDTO();
 
-
         dto.setStudentName(user.getUsername());
-
-
-
         dto.setExamTitle(exam.getExamTitle());
         dto.setExamDate(exam.getExamDate());
-
-
         dto.setScore(result.getScore());
         dto.setGrade(result.getGrade());
 
         // PASS / FAIL logic
-        if (result.getScore() >= 40) {
-            dto.setResultStatus("PASS");
-        } else {
+        if (result.getGrade() == "FAIL") {
             dto.setResultStatus("FAIL");
+        } else {
+            dto.setResultStatus("PASS");
         }
 
         dto.setEvaluatedAt(result.getEvaluatedAt());
@@ -267,30 +259,7 @@ public class ResultServiceImpl implements ResultService {
                         + dto.getGrade();
 
         dto.setCertificateText(text);
-
         return dto;
     }
 
-    @Override
-    public byte[] exportResultsByExam(Long examId) {
-
-        List<Result> results =
-                resultRepository.findByExamId(examId);
-
-        StringBuilder sb = new StringBuilder();
-
-        // header
-        sb.append("ResultId,UserId,ExamId,Score,Grade\n");
-
-        for (Result r : results) {
-
-            sb.append(r.getId()).append(",");
-            sb.append(r.getUserId()).append(",");
-            sb.append(r.getExamId()).append(",");
-            sb.append(r.getScore()).append(",");
-            sb.append(r.getGrade()).append("\n");
-        }
-
-        return sb.toString().getBytes();
-    }
 }

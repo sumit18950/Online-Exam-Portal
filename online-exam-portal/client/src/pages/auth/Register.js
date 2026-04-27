@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../../services/api';
+import { Alert, Button, Card, FormField } from '../../components/ui';
+import logo from '../../logo.svg';
 import './Auth.css';
 
 export const Register = () => {
@@ -16,18 +18,13 @@ export const Register = () => {
 
   const getErrorMessage = (err, fallback) => {
     const payload = err.response?.data;
-    if (typeof payload === 'string') {
-      return payload;
-    }
+    if (typeof payload === 'string') return payload;
     return payload?.message || payload?.error || err.message || fallback;
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
@@ -35,37 +32,37 @@ export const Register = () => {
     setError('');
 
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
+      setError('Passwords do not match.');
       return;
     }
 
     setLoading(true);
-
     try {
       await api.post('/api/auth/register', {
         username: formData.username,
         email: formData.email,
         password: formData.password,
       });
-
       navigate('/login');
     } catch (err) {
-      const message = getErrorMessage(err, 'Registration failed. Please try again.');
-      setError(message);
-      console.error('Registration error:', err);
+      setError(getErrorMessage(err, 'Registration failed. Please try again.'));
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="auth-container">
-      <div className="auth-card">
-        <h2>Register</h2>
-        {error && <div className="error-message">{error}</div>}
+    <div className="auth-layout">
+      <section className="auth-aside">
+        <img src={logo} alt="Exam portal" />
+        <h2>Create your account</h2>
+        <p>Join the portal and get a workspace tailored for your role and exam tasks.</p>
+      </section>
+
+      <Card className="auth-form-card" title="Register" subtitle="Set up your account in less than a minute.">
+        <Alert type="error">{error}</Alert>
         <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="username">Username</label>
+          <FormField id="username" label="Username">
             <input
               type="text"
               id="username"
@@ -74,10 +71,11 @@ export const Register = () => {
               onChange={handleChange}
               required
               disabled={loading}
+              placeholder="Enter username"
             />
-          </div>
-          <div className="form-group">
-            <label htmlFor="email">Email</label>
+          </FormField>
+
+          <FormField id="email" label="Email">
             <input
               type="email"
               id="email"
@@ -86,10 +84,11 @@ export const Register = () => {
               onChange={handleChange}
               required
               disabled={loading}
+              placeholder="you@example.com"
             />
-          </div>
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
+          </FormField>
+
+          <FormField id="password" label="Password">
             <input
               type="password"
               id="password"
@@ -98,10 +97,11 @@ export const Register = () => {
               onChange={handleChange}
               required
               disabled={loading}
+              placeholder="Create password"
             />
-          </div>
-          <div className="form-group">
-            <label htmlFor="confirmPassword">Confirm Password</label>
+          </FormField>
+
+          <FormField id="confirmPassword" label="Confirm Password">
             <input
               type="password"
               id="confirmPassword"
@@ -110,16 +110,19 @@ export const Register = () => {
               onChange={handleChange}
               required
               disabled={loading}
+              placeholder="Confirm password"
             />
-          </div>
-          <button type="submit" disabled={loading} className="submit-btn">
+          </FormField>
+
+          <Button type="submit" fullWidth disabled={loading}>
             {loading ? 'Registering...' : 'Register'}
-          </button>
+          </Button>
         </form>
-        <p className="form-footer">
-          Already have an account? <Link to="/login">Login here</Link>
+
+        <p className="auth-footer-text">
+          Already have an account? <Link to="/login">Login</Link>
         </p>
-      </div>
+      </Card>
     </div>
   );
 };
