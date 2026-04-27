@@ -59,10 +59,10 @@ public class ResultServiceImpl implements ResultService {
 //                examsRepository.findById (result.getExamId()).orElse(null);
 
         Integer examId = result.getExamId() == null ? null : Math.toIntExact(result.getExamId());
-        Exams exam = examId == null ? null : examsRepository.findById(examId).orElseThrow(()->new RuntimeException("Exam not found"));
+        Exams exam = examId == null ? null : examsRepository.findById(examId).orElse(null);
 
 
-        dto.setExamTitle(exam.getExamTitle());
+        dto.setExamTitle(exam != null ? exam.getExamTitle() : "Deleted Exam");
 
 
         return dto;
@@ -85,10 +85,10 @@ public class ResultServiceImpl implements ResultService {
 
 
         Integer examId = result.getExamId() == null ? null : Math.toIntExact(result.getExamId());
-        Exams exam = examId == null ? null : examsRepository.findById(examId).orElseThrow(()->new RuntimeException("Exam not found"));
+        Exams exam = examId == null ? null : examsRepository.findById(examId).orElse(null);
 
 
-            dto.setExamTitle(exam.getExamTitle());
+            dto.setExamTitle(exam != null ? exam.getExamTitle() : "Deleted Exam");
 
 
         return dto;
@@ -229,7 +229,7 @@ public class ResultServiceImpl implements ResultService {
 //                examsRepository.findById(result.getExamId()).orElse(null);
 
         Integer examId = result.getExamId() == null ? null : Math.toIntExact(result.getExamId());
-        Exams exam = examId == null ? null : examsRepository.findById(examId).orElseThrow(()->new RuntimeException("Exam not found"));
+        Exams exam = examId == null ? null : examsRepository.findById(examId).orElse(null);
 
 
         ResultCertificateDTO dto = new ResultCertificateDTO();
@@ -239,8 +239,8 @@ public class ResultServiceImpl implements ResultService {
 
 
 
-        dto.setExamTitle(exam.getExamTitle());
-        dto.setExamDate(exam.getExamDate());
+        dto.setExamTitle(exam != null ? exam.getExamTitle() : "Deleted Exam");
+        dto.setExamDate(exam != null ? exam.getExamDate() : null);
 
 
         dto.setScore(result.getScore());

@@ -167,14 +167,6 @@ export const ManageExams = () => {
                   <option value="MULTIPLE_CHOICE">Multiple Choice</option>
                 </select>
               </div>
-              <div className="form-group">
-                <label htmlFor="status">Status</label>
-                <select id="status" name="status" value={formData.status} onChange={handleChange} disabled={submitting}>
-                  <option value="SCHEDULED">Scheduled</option>
-                  <option value="ONGOING">Ongoing</option>
-                  <option value="COMPLETED">Completed</option>
-                </select>
-              </div>
             </div>
             <div className="button-group">
               <button type="submit" disabled={submitting} className="btn btn-primary">

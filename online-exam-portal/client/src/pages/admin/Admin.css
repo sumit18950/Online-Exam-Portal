@@ -126,7 +126,9 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 1.5rem;
+
 }
+
 
 .action-card {
   display: block;
@@ -135,7 +137,7 @@
   border-radius: 12px;
   text-decoration: none;
   transition: all 0.25s;
-  background: #f0fdfa;
+ background: #f0fdfa;
 }
 
 .action-card:hover {
@@ -379,7 +381,7 @@
 
 .status-scheduled { background-color: #fef3c7; color: #d97706; }
 .status-ongoing { background-color: #d1fae5; color: #059669; }
-.status-completed { background-color: #f1f5f9; color: #475569; }
+.status-completed { background-color: red; color: #475569;}
 
 .grade-badge {
   display: inline-block;

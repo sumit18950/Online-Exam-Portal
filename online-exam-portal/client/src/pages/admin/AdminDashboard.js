@@ -26,7 +26,7 @@ export const AdminDashboard = () => {
     { to: '/admin/users', icon: <HiOutlineUsers />, title: 'View All Users', desc: 'Manage registered users and their roles' },
     { to: '/admin/create-user', icon: <HiOutlineUserPlus />, title: 'Create User', desc: 'Create a new user with a specific role' },
     { to: '/admin/subjects', icon: <HiOutlineSquares2X2 />, title: 'Manage Subjects', desc: 'Create, edit, and delete subjects' },
-    { to: '/admin/exams', icon: <HiOutlineBookOpen />, title: 'Manage Exams', desc: 'Create, edit, and manage all exams' },
+    { to: '/admin/exams', icon: <HiOutlineBookOpen />, title: 'Manage Exams', desc: 'Create, edit, and manage all exams', variant: 'danger' },
     { to: '/admin/questions', icon: <HiOutlineClipboardDocumentList />, title: 'Manage Questions', desc: 'View, add, and delete questions' },
     { to: '/admin/results', icon: <HiOutlineChartBar />, title: 'View Results', desc: 'View all student exam results' },
     { to: '/profile', icon: <HiOutlineUser />, title: 'My Profile', desc: 'View and update your profile' },

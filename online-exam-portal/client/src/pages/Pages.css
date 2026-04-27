@@ -94,6 +94,7 @@
 /* Hero Visual */
 .hero-visual {
   flex-shrink: 0;
+
 }
 
 .hero-stat-grid {
@@ -103,12 +104,14 @@
 }
 
 .hero-stat-card {
+
   background: #ffffff;
   border: 1.5px solid #e5e7eb;
   border-radius: 14px;
   padding: 1.5rem 2rem;
   text-align: center;
   transition: transform 0.25s;
+
 }
 
 .hero-stat-card:hover {
