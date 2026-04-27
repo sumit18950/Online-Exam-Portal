@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Alert, Card, Loader } from '../../components/ui';
-import { RoleSidebar } from '../../components/RoleSidebar';
 import api from '../../services/api';
 import './Admin.css';
 
 export const AdminResults = () => {
   const [results, setResults] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -26,54 +25,55 @@ export const AdminResults = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="role-layout">
-        <RoleSidebar role="ADMIN" />
-        <main className="role-main"><Card><Loader text="Loading results..." /></Card></main>
-      </div>
-    );
-  }
+  if (loading) return <div className="container"><div className="loading">Loading...</div></div>;
 
   return (
-    <div className="role-layout">
-      <RoleSidebar role="ADMIN" />
-
-      <main className="role-main">
-        <Card title="Student Results" subtitle="See all submitted attempts and grades.">
-          <Alert type="error">{error}</Alert>
-          {results.length === 0 ? (
-            <p className="no-data">No results available yet.</p>
-          ) : (
-            <div className="table-responsive">
-              <table className="users-table">
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Student</th>
-                    <th>Exam</th>
-                    <th>Score</th>
-                    <th>Grade</th>
-                    <th>Evaluated At</th>
+    <div className="container">
+      <div className="admin-card">
+        <div className="card-header">
+          <h2>Student Results</h2>
+          <input type="text" className="search-input" placeholder="Search by student, exam or grade..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+        </div>
+        {error && <div className="error-message">{error}</div>}
+        {results.length === 0 ? (
+          <p className="no-data">No results available yet.</p>
+        ) : (
+          <div className="table-responsive">
+            <table className="users-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Student</th>
+                  <th>Exam</th>
+                  <th>Score</th>
+                  <th>Grade</th>
+                  <th>Evaluated At</th>
+                </tr>
+              </thead>
+              <tbody>
+                {results.filter((result) => {
+                  if (!searchTerm.trim()) return true;
+                  const term = searchTerm.toLowerCase();
+                  return (
+                    (result.username || '').toLowerCase().includes(term) ||
+                    (result.examTitle || '').toLowerCase().includes(term) ||
+                    (result.grade || '').toLowerCase().includes(term)
+                  );
+                }).map((result) => (
+                  <tr key={result.id}>
+                    <td>{result.id}</td>
+                    <td>{result.username || `User ${result.userId}`}</td>
+                    <td>{result.examTitle || `Exam ${result.examId}`}</td>
+                    <td><strong>{result.score}</strong></td>
+                    <td><span className={`grade-badge grade-${(result.grade || '').charAt(0).toLowerCase()}`}>{result.grade || 'N/A'}</span></td>
+                    <td>{result.evaluatedAt ? new Date(result.evaluatedAt).toLocaleString() : 'N/A'}</td>
                   </tr>
-                </thead>
-                <tbody>
-                  {results.map((result) => (
-                    <tr key={result.id}>
-                      <td>{result.id}</td>
-                      <td>{result.username || `User ${result.userId}`}</td>
-                      <td>{result.examTitle || `Exam ${result.examId}`}</td>
-                      <td><strong>{result.score}</strong></td>
-                      <td><span className={`grade-badge grade-${(result.grade || '').charAt(0).toLowerCase()}`}>{result.grade || 'N/A'}</span></td>
-                      <td>{result.evaluatedAt ? new Date(result.evaluatedAt).toLocaleString() : 'N/A'}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </Card>
-      </main>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

@@ -7,6 +7,7 @@ export const ManageExams = () => {
   const { user } = useContext(AuthContext);
   const [exams, setExams] = useState([]);
   const [subjects, setSubjects] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -119,9 +120,12 @@ export const ManageExams = () => {
       <div className="teacher-card">
         <div className="card-header">
           <h2>Manage Exams</h2>
-          <button onClick={() => { resetForm(); setShowForm(!showForm); }} className="btn btn-primary">
-            {showForm ? 'Cancel' : 'Create Exam'}
-          </button>
+          <div className="header-actions">
+            <input type="text" className="search-input" placeholder="Search by title, subject or status..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+            <button onClick={() => { resetForm(); setShowForm(!showForm); }} className="btn btn-primary">
+              {showForm ? 'Cancel' : 'Create Exam'}
+            </button>
+          </div>
         </div>
 
         {error && <div className="error-message">{error}</div>}
@@ -163,14 +167,6 @@ export const ManageExams = () => {
                   <option value="MULTIPLE_CHOICE">Multiple Choice</option>
                 </select>
               </div>
-              <div className="form-group">
-                <label htmlFor="status">Status</label>
-                <select id="status" name="status" value={formData.status} onChange={handleChange} disabled={submitting}>
-                  <option value="SCHEDULED">Scheduled</option>
-                  <option value="ONGOING">Ongoing</option>
-                  <option value="COMPLETED">Completed</option>
-                </select>
-              </div>
             </div>
             <div className="button-group">
               <button type="submit" disabled={submitting} className="btn btn-primary">
@@ -199,7 +195,15 @@ export const ManageExams = () => {
                 </tr>
               </thead>
               <tbody>
-                {exams.map((exam) => (
+                {exams.filter((exam) => {
+                  if (!searchTerm.trim()) return true;
+                  const term = searchTerm.toLowerCase();
+                  return (
+                    (exam.examTitle || '').toLowerCase().includes(term) ||
+                    (exam.subjectName || '').toLowerCase().includes(term) ||
+                    (exam.status || '').toLowerCase().includes(term)
+                  );
+                }).map((exam) => (
                   <tr key={exam.id}>
                     <td>{exam.id}</td>
                     <td>{exam.examTitle}</td>

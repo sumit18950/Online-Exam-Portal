@@ -1,42 +1,37 @@
 import { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
-import { Layers, BookOpen, FileText, BarChart, User } from '../../components/Icons';
-import { Card } from '../../components/ui';
-import { RoleSidebar } from '../../components/RoleSidebar';
+import { HiOutlineSquares2X2, HiOutlineBookOpen, HiOutlineClipboardDocumentList, HiOutlineChartBar, HiOutlineUser } from 'react-icons/hi2';
 import './Teacher.css';
 
 export const TeacherDashboard = () => {
   const { user } = useContext(AuthContext);
 
-  const cards = [
-    { to: '/teacher/subjects', title: 'Manage Subjects', desc: 'Add, edit, or delete subjects', icon: Layers },
-    { to: '/teacher/exams', title: 'Manage Exams', desc: 'Create and manage exams', icon: BookOpen },
-    { to: '/teacher/questions', title: 'Manage Questions', desc: 'Create, update, and delete questions', icon: FileText },
-    { to: '/teacher/results', title: 'View Results', desc: 'View student exam results', icon: BarChart },
-    { to: '/profile', title: 'My Profile', desc: 'View and update your profile', icon: User },
+  const actions = [
+    { to: '/teacher/subjects', icon: <HiOutlineSquares2X2 />, title: 'Manage Subjects', desc: 'Add, edit, or delete subjects' },
+    { to: '/teacher/exams', icon: <HiOutlineBookOpen />, title: 'Manage Exams', desc: 'Create and manage exams' },
+    { to: '/teacher/questions', icon: <HiOutlineClipboardDocumentList />, title: 'Manage Questions', desc: 'Create, update, and delete questions' },
+    { to: '/teacher/results', icon: <HiOutlineChartBar />, title: 'View Results', desc: 'View student exam results' },
+    { to: '/profile', icon: <HiOutlineUser />, title: 'My Profile', desc: 'View and update your profile' },
   ];
 
   return (
-    <div className="role-layout">
-      <RoleSidebar role="TEACHER" />
+    <div className="container">
+      <div className="dashboard-card">
+        <h2>Teacher Dashboard</h2>
+        <p className="welcome-msg">Welcome, {user?.username || 'Teacher'}!</p>
+        <p className="role-label">Role: TEACHER</p>
 
-      <main className="role-main">
-        <Card title="Teacher Dashboard" subtitle={`Welcome, ${user?.username || 'Teacher'}`}>
-          <div className="dashboard-actions">
-            {cards.map((card) => {
-              const Icon = card.icon;
-              return (
-                <Link to={card.to} className="action-card" key={card.to}>
-                  <span className="action-icon"><Icon style={{ width: '1.2rem', height: '1.2rem', fill: 'currentColor' }} /></span>
-                  <h3>{card.title}</h3>
-                  <p>{card.desc}</p>
-                </Link>
-              );
-            })}
-          </div>
-        </Card>
-      </main>
+        <div className="dashboard-actions">
+          {actions.map((a) => (
+            <Link key={a.to} to={a.to} className="action-card">
+              <span className="action-icon">{a.icon}</span>
+              <h3>{a.title}</h3>
+              <p>{a.desc}</p>
+            </Link>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };

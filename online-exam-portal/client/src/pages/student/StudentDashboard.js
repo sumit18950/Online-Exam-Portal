@@ -1,41 +1,36 @@
 import { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
-import { BookOpen, BarChart, User, Key } from '../../components/Icons';
-import { Card } from '../../components/ui';
-import { RoleSidebar } from '../../components/RoleSidebar';
+import { HiOutlineBookOpen, HiOutlineChartBar, HiOutlineUser, HiOutlineKey } from 'react-icons/hi2';
 import './Student.css';
 
 export const StudentDashboard = () => {
   const { user } = useContext(AuthContext);
 
-  const cards = [
-    { to: '/student/exams', title: 'View Exams', desc: 'Browse and attempt available exams', icon: BookOpen },
-    { to: '/student/results', title: 'My Results', desc: 'View your exam results and scores', icon: BarChart },
-    { to: '/profile', title: 'My Profile', desc: 'View and update your profile', icon: User },
-    { to: '/change-password', title: 'Change Password', desc: 'Update your account password', icon: Key },
+  const actions = [
+    { to: '/student/exams', icon: <HiOutlineBookOpen />, title: 'View Exams', desc: 'Browse and attempt available exams' },
+    { to: '/student/results', icon: <HiOutlineChartBar />, title: 'My Results', desc: 'View your exam results and scores' },
+    { to: '/profile', icon: <HiOutlineUser />, title: 'My Profile', desc: 'View and update your profile' },
+    { to: '/change-password', icon: <HiOutlineKey />, title: 'Change Password', desc: 'Update your account password' },
   ];
 
   return (
-    <div className="role-layout">
-      <RoleSidebar role="STUDENT" />
+    <div className="container">
+      <div className="dashboard-card">
+        <h2>Student Dashboard</h2>
+        <p className="welcome-msg">Welcome, {user?.username || 'Student'}!</p>
+        <p className="role-label">Role: STUDENT</p>
 
-      <main className="role-main">
-        <Card title="Student Dashboard" subtitle={`Welcome, ${user?.username || 'Student'}`}>
-          <div className="dashboard-actions">
-            {cards.map((card) => {
-              const Icon = card.icon;
-              return (
-                <Link to={card.to} className="action-card" key={card.to}>
-                  <span className="action-icon"><Icon style={{ width: '1.2rem', height: '1.2rem', fill: 'currentColor' }} /></span>
-                  <h3>{card.title}</h3>
-                  <p>{card.desc}</p>
-                </Link>
-              );
-            })}
-          </div>
-        </Card>
-      </main>
+        <div className="dashboard-actions">
+          {actions.map((a) => (
+            <Link key={a.to} to={a.to} className="action-card">
+              <span className="action-icon">{a.icon}</span>
+              <h3>{a.title}</h3>
+              <p>{a.desc}</p>
+            </Link>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };

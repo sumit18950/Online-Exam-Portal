@@ -6,10 +6,13 @@ import com.springboot.online_exam_portal.dto.SubjectRequest;
 import com.springboot.online_exam_portal.entity.Exams;
 import com.springboot.online_exam_portal.entity.Subject;
 import com.springboot.online_exam_portal.entity.User;
+import com.springboot.online_exam_portal.repository.ExamEnrollmentRepository;
 import com.springboot.online_exam_portal.repository.ExamsRepository;
 import com.springboot.online_exam_portal.repository.QuestionRepository;
+import com.springboot.online_exam_portal.repository.StudentAnswerRepository;
 import com.springboot.online_exam_portal.repository.SubjectRepository;
 import com.springboot.online_exam_portal.repository.UserRepository;
+import com.springboot.online_exam_portal.resultAnalysis.repository.ResultRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -33,6 +36,9 @@ public class ExamServiceImpl implements ExamService {
     @Autowired private ExamsRepository examRepo;
     @Autowired private QuestionRepository questionRepo;
     @Autowired private UserRepository userRepo;
+    @Autowired private StudentAnswerRepository studentAnswerRepo;
+    @Autowired private ExamEnrollmentRepository examEnrollmentRepo;
+    @Autowired private ResultRepository resultRepo;
 
 
 
@@ -201,25 +207,30 @@ public class ExamServiceImpl implements ExamService {
     }
 
     @Override
+    @Transactional
     public String deleteExam(int id, Authentication authentication) {
         Exams exam = examRepo.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Exam not found with id: " + id));
 
-        if (hasRole(authentication, ROLE_ADMIN)) {
-            examRepo.delete(exam);
-            return "Exam deleted successfully by admin.";
-        }
-
-        if (!hasRole(authentication, ROLE_TEACHER)) {
+        if (!hasRole(authentication, ROLE_ADMIN) && !hasRole(authentication, ROLE_TEACHER)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only ADMIN or TEACHER can delete exams");
         }
 
-        User currentUser = getCurrentUser(authentication);
-        Integer examOwnerId = exam.getCreatedBy();
-        if (examOwnerId == null || examOwnerId.intValue() != currentUser.getId().intValue()) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
-                    "Teachers can delete only exams created by them");
+        if (hasRole(authentication, ROLE_TEACHER) && !hasRole(authentication, ROLE_ADMIN)) {
+            User currentUser = getCurrentUser(authentication);
+            Integer examOwnerId = exam.getCreatedBy();
+            if (examOwnerId == null || examOwnerId.intValue() != currentUser.getId().intValue()) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                        "Teachers can delete only exams created by them");
+            }
         }
+
+        // Delete all related data before deleting the exam
+        Long examIdLong = (long) id;
+        studentAnswerRepo.deleteByExamId(examIdLong);
+        resultRepo.deleteByExamId(examIdLong);
+        examEnrollmentRepo.deleteByExamId(examIdLong);
+        questionRepo.deleteByExam_Id(id);
 
         examRepo.delete(exam);
         return "Exam deleted successfully.";

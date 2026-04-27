@@ -1,10 +1,9 @@
 package com.springboot.online_exam_portal.service;
 
 
-import com.springboot.online_exam_portal.entity.Option;
-import com.springboot.online_exam_portal.entity.Questions;
-import com.springboot.online_exam_portal.entity.Result;
-import com.springboot.online_exam_portal.entity.StudentAnswer;
+import com.springboot.online_exam_portal.dto.ExamFeedbackDTO;
+import com.springboot.online_exam_portal.entity.*;
+import com.springboot.online_exam_portal.repository.ExamsRepository;
 import com.springboot.online_exam_portal.repository.OptionRepository;
 import com.springboot.online_exam_portal.repository.QuestionRepository;
 import com.springboot.online_exam_portal.resultAnalysis.repository.ResultRepository;
@@ -13,7 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class AnswerServiceImpl implements AnswerService {
@@ -29,6 +31,9 @@ public class AnswerServiceImpl implements AnswerService {
 
     @Autowired
     private QuestionRepository questionRepo;
+
+    @Autowired
+    private ExamsRepository examsRepo;
 
     public String submitAnswer(StudentAnswer answer){
 
@@ -95,6 +100,78 @@ public class AnswerServiceImpl implements AnswerService {
         result.setEvaluatedAt(LocalDateTime.now());
 
         return resultRepo.save(result);
+    }
+
+    public ExamFeedbackDTO getExamFeedback(Long examId, Long userId) {
+        // Get the exam
+        Exams exam = examsRepo.findById(Math.toIntExact(examId)).orElse(null);
+        if (exam == null) {
+            throw new RuntimeException("Exam not found");
+        }
+
+        // Get all questions for this exam
+        List<Questions> questions = questionRepo.findByExamId(examId);
+
+        // Get all student answers for this exam
+        List<StudentAnswer> studentAnswers = answerRepo.findByExamIdAndUserId(examId, userId);
+        Map<Long, Long> answerMap = studentAnswers.stream()
+                .collect(Collectors.toMap(StudentAnswer::getQuestionId, StudentAnswer::getSelectedOptionId));
+
+        // Get the result
+        List<Result> results = resultRepo.findByUserId(userId);
+        Result result = results.stream()
+                .filter(r -> r.getExamId().equals(examId))
+                .findFirst().orElse(null);
+
+        int totalScore = 0;
+        int obtainedScore = 0;
+
+        List<ExamFeedbackDTO.QuestionFeedback> questionFeedbacks = new ArrayList<>();
+
+        for (Questions q : questions) {
+            ExamFeedbackDTO.QuestionFeedback qf = new ExamFeedbackDTO.QuestionFeedback();
+            qf.setQuestionId(q.getId().longValue());
+            qf.setQuestionText(q.getQuestionText());
+            qf.setMarks(q.getMarks() != null ? q.getMarks() : 0);
+            totalScore += qf.getMarks();
+
+            Long selectedOptionId = answerMap.get(q.getId().longValue());
+            qf.setSelectedOptionId(selectedOptionId);
+
+            // Build option feedbacks and find correct option
+            Long correctOptionId = null;
+            List<ExamFeedbackDTO.OptionFeedback> optionFeedbacks = new ArrayList<>();
+            for (Option opt : q.getOptions()) {
+                ExamFeedbackDTO.OptionFeedback of = new ExamFeedbackDTO.OptionFeedback();
+                of.setOptionId(opt.getId().longValue());
+                of.setOptionText(opt.getOptionText());
+                of.setCorrect(opt.getIsCorrect() != null && opt.getIsCorrect());
+                if (of.isCorrect()) {
+                    correctOptionId = opt.getId().longValue();
+                }
+                optionFeedbacks.add(of);
+            }
+            qf.setOptions(optionFeedbacks);
+            qf.setCorrectOptionId(correctOptionId);
+
+            boolean isCorrect = selectedOptionId != null && selectedOptionId.equals(correctOptionId);
+            qf.setCorrect(isCorrect);
+            if (isCorrect) {
+                obtainedScore += qf.getMarks();
+            }
+
+            questionFeedbacks.add(qf);
+        }
+
+        ExamFeedbackDTO dto = new ExamFeedbackDTO();
+        dto.setExamId(examId);
+        dto.setExamTitle(exam.getExamTitle());
+        dto.setTotalScore(totalScore);
+        dto.setObtainedScore(obtainedScore);
+        dto.setGrade(result != null ? result.getGrade() : "N/A");
+        dto.setQuestions(questionFeedbacks);
+
+        return dto;
     }
 }
 

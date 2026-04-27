@@ -1,6 +1,7 @@
 package com.springboot.online_exam_portal.controller;
 
 
+import com.springboot.online_exam_portal.dto.ExamFeedbackDTO;
 import com.springboot.online_exam_portal.entity.Result;
 import com.springboot.online_exam_portal.entity.StudentAnswer;
 import com.springboot.online_exam_portal.service.AnswerServiceImpl;
@@ -27,6 +28,12 @@ public class AnswerController {
                              @RequestParam Long userId){
 
         return answerService.evaluateExam(examId,userId);
+    }
+
+    @GetMapping("/feedback")
+    public ExamFeedbackDTO getExamFeedback(@RequestParam Long examId,
+                                           @RequestParam Long userId) {
+        return answerService.getExamFeedback(examId, userId);
     }
 }
 
