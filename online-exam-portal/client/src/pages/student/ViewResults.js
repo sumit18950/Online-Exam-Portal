@@ -78,7 +78,10 @@ export const ViewResults = () => {
                     </span>
                   </div>
                 </div>
-                <div className="result-card-hint">Click to view detailed feedback</div>
+                <div className="result-card-actions">
+                  <span className="result-card-hint">Click to view detailed feedback</span>
+                  <button className="btn btn-primary btn-small" onClick={(e) => { e.stopPropagation(); navigate(`/student/certificate/${result.id}`); }}>View Certificate</button>
+                </div>
               </div>
             ))}
           </div>

@@ -31,6 +31,7 @@ import { ViewExams } from './pages/student/ViewExams';
 import { AttemptExam } from './pages/student/AttemptExam';
 import { ViewResults } from './pages/student/ViewResults';
 import { ExamFeedback } from './pages/student/ExamFeedback';
+import { Certificate } from './pages/student/Certificate';
 
 import { Home, Unauthorized, NotFound } from './pages/Pages';
 
@@ -77,6 +78,7 @@ function App() {
           <Route path="/student/exams/:examId/attempt" element={<ProtectedRoute requiredRole="STUDENT"><AttemptExam /></ProtectedRoute>} />
           <Route path="/student/results" element={<ProtectedRoute requiredRole="STUDENT"><ViewResults /></ProtectedRoute>} />
           <Route path="/student/results/:examId/feedback" element={<ProtectedRoute requiredRole="STUDENT"><ExamFeedback /></ProtectedRoute>} />
+          <Route path="/student/certificate/:resultId" element={<ProtectedRoute requiredRole="STUDENT"><Certificate /></ProtectedRoute>} />
 
           {/* Fallback */}
           <Route path="*" element={<NotFound />} />

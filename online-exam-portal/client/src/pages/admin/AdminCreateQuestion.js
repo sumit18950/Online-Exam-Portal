@@ -108,7 +108,7 @@ export const AdminCreateQuestion = () => {
 
     try {
       await api.post('/api/questions/upload', payload);
-      setSuccess('Question created successfully!');
+      setSuccess('Question created successfully! You can add another question.');
       setFormData({
         questionText: '', questionType: 'MULTIPLE_CHOICE', marks: 1,
         options: [
@@ -118,7 +118,6 @@ export const AdminCreateQuestion = () => {
           { optionText: '', isCorrect: false },
         ],
       });
-      setTimeout(() => navigate('/admin/questions'), 2000);
     } catch (err) {
       const p = err.response?.data;
       setError(typeof p === 'string' ? p : p?.message || 'Failed to create question');
