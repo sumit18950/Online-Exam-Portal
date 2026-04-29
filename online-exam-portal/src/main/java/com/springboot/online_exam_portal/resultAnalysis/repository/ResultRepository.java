@@ -14,4 +14,5 @@ public interface ResultRepository
 
     List<Result> findByExamIdOrderByScoreDesc(Long examId);
     void deleteByExamId(Long examId);
+    void deleteByUserId(Long userId);
 }

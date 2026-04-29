@@ -48,20 +48,11 @@ public class ResultServiceImpl implements ResultService {
         dto.setGrade(result.getGrade());
         dto.setEvaluatedAt(result.getEvaluatedAt());
 
-        User user =
-                userRepository.findById(result.getUserId()).orElseThrow(()-> new RuntimeException("User not found"));
-
-
-        dto.setUsername(user.getUsername());
-
-//
-//        Exams exam =
-//                examsRepository.findById (result.getExamId()).orElse(null);
+        User user = userRepository.findById(result.getUserId()).orElse(null);
+        dto.setUsername(user != null ? user.getUsername() : "Deleted User");
 
         Integer examId = result.getExamId() == null ? null : Math.toIntExact(result.getExamId());
         Exams exam = examId == null ? null : examsRepository.findById(examId).orElse(null);
-
-
         dto.setExamTitle(exam != null ? exam.getExamTitle() : "Deleted Exam");
 
 
@@ -77,11 +68,8 @@ public class ResultServiceImpl implements ResultService {
         dto.setScore(result.getScore());
         dto.setGrade(result.getGrade());
 
-        User user =
-                userRepository.findById(result.getUserId()).orElseThrow(()->new RuntimeException("User not found"));
-
-
-        dto.setUsername(user.getUsername());
+        User user = userRepository.findById(result.getUserId()).orElse(null);
+        dto.setUsername(user != null ? user.getUsername() : "Deleted User");
 
 
         Integer examId = result.getExamId() == null ? null : Math.toIntExact(result.getExamId());
@@ -222,20 +210,13 @@ public class ResultServiceImpl implements ResultService {
         Result result =
                 resultRepository.findById(resultId).orElseThrow(()->new RuntimeException("Result of this ID doesn't exist"));
 
-        User user =
-                userRepository.findById(result.getUserId()).orElseThrow(()->new RuntimeException("User not found"));
-
-//        Exams exam =
-//                examsRepository.findById(result.getExamId()).orElse(null);
+        User user = userRepository.findById(result.getUserId()).orElse(null);
 
         Integer examId = result.getExamId() == null ? null : Math.toIntExact(result.getExamId());
         Exams exam = examId == null ? null : examsRepository.findById(examId).orElse(null);
 
-
         ResultCertificateDTO dto = new ResultCertificateDTO();
-
-
-        dto.setStudentName(user.getUsername());
+        dto.setStudentName(user != null ? user.getUsername() : "Deleted User");
 
 
 

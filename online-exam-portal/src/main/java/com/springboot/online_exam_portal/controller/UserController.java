@@ -3,11 +3,17 @@ package com.springboot.online_exam_portal.controller;
 import com.springboot.online_exam_portal.dto.*;
 import com.springboot.online_exam_portal.entity.Role;
 import com.springboot.online_exam_portal.entity.User;
+import com.springboot.online_exam_portal.entity.Result;
+import com.springboot.online_exam_portal.repository.ExamEnrollmentRepository;
 import com.springboot.online_exam_portal.repository.RoleRepository;
+import com.springboot.online_exam_portal.repository.StudentAnswerRepository;
 import com.springboot.online_exam_portal.repository.UserRepository;
+import com.springboot.online_exam_portal.resultAnalysis.repository.ResultRepository;
+import com.springboot.online_exam_portal.resultAnalysis.repository.ScoreReviewHistoryRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -25,13 +31,25 @@ public class UserController {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final StudentAnswerRepository studentAnswerRepository;
+    private final ExamEnrollmentRepository examEnrollmentRepository;
+    private final ResultRepository resultRepository;
+    private final ScoreReviewHistoryRepository scoreReviewHistoryRepository;
 
     public UserController(UserRepository userRepository,
                           RoleRepository roleRepository,
-                          PasswordEncoder passwordEncoder) {
+                          PasswordEncoder passwordEncoder,
+                          StudentAnswerRepository studentAnswerRepository,
+                          ExamEnrollmentRepository examEnrollmentRepository,
+                          ResultRepository resultRepository,
+                          ScoreReviewHistoryRepository scoreReviewHistoryRepository) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
+        this.studentAnswerRepository = studentAnswerRepository;
+        this.examEnrollmentRepository = examEnrollmentRepository;
+        this.resultRepository = resultRepository;
+        this.scoreReviewHistoryRepository = scoreReviewHistoryRepository;
     }
 
     //  1. GET PROFILE
@@ -162,12 +180,23 @@ public class UserController {
     }
 
     //  7. DELETE USER (ADMIN)
+    @Transactional
     @DeleteMapping("/{id}")
     public String deleteUser(@PathVariable Long id){
 
         if(!userRepository.existsById(id)){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
         }
+
+        // Clean up all related data before deleting the user
+        studentAnswerRepository.deleteByUserId(id);
+        // Delete score_review_history for each result before deleting results
+        List<Result> userResults = resultRepository.findByUserId(id);
+        for (Result r : userResults) {
+            scoreReviewHistoryRepository.deleteByResultId(r.getId());
+        }
+        resultRepository.deleteByUserId(id);
+        examEnrollmentRepository.deleteByUserId(id);
 
         userRepository.deleteById(id);
         return "User deleted successfully";

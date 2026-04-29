@@ -11,4 +11,6 @@ public interface StudentAnswerRepository extends JpaRepository<StudentAnswer, Lo
     List<StudentAnswer> findByExamIdAndUserId(Long examId, Long userId);
     StudentAnswer findByExamIdAndQuestionIdAndUserId(Long examId, Long questionId, Long userId);
     void deleteByExamId(Long examId);
+    void deleteByUserId(Long userId);
+    void deleteByQuestionId(Long questionId);
 }

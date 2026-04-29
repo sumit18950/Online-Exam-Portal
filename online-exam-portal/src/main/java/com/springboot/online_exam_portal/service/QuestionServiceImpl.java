@@ -4,6 +4,7 @@ import com.springboot.online_exam_portal.entity.Questions;
 import com.springboot.online_exam_portal.entity.Subject;
 import com.springboot.online_exam_portal.repository.ExamsRepository;
 import com.springboot.online_exam_portal.repository.QuestionRepository;
+import com.springboot.online_exam_portal.repository.StudentAnswerRepository;
 import com.springboot.online_exam_portal.repository.SubjectRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,9 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Autowired
     private SubjectRepository subjectRepo;
+
+    @Autowired
+    private StudentAnswerRepository studentAnswerRepo;
 
     @Override
     @Transactional
@@ -100,7 +104,10 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
+    @Transactional
     public void deleteQuestion(Integer id) {
-        questionRepo.deleteById(Objects.requireNonNull(id));
+        Objects.requireNonNull(id);
+        studentAnswerRepo.deleteByQuestionId(id.longValue());
+        questionRepo.deleteById(id);
     }
 }

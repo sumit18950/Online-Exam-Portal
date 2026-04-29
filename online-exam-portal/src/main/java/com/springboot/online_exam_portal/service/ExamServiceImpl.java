@@ -12,7 +12,9 @@ import com.springboot.online_exam_portal.repository.QuestionRepository;
 import com.springboot.online_exam_portal.repository.StudentAnswerRepository;
 import com.springboot.online_exam_portal.repository.SubjectRepository;
 import com.springboot.online_exam_portal.repository.UserRepository;
+import com.springboot.online_exam_portal.entity.Result;
 import com.springboot.online_exam_portal.resultAnalysis.repository.ResultRepository;
+import com.springboot.online_exam_portal.resultAnalysis.repository.ScoreReviewHistoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -39,6 +41,7 @@ public class ExamServiceImpl implements ExamService {
     @Autowired private StudentAnswerRepository studentAnswerRepo;
     @Autowired private ExamEnrollmentRepository examEnrollmentRepo;
     @Autowired private ResultRepository resultRepo;
+    @Autowired private ScoreReviewHistoryRepository scoreReviewHistoryRepo;
 
 
 
@@ -97,9 +100,7 @@ public class ExamServiceImpl implements ExamService {
         long linkedQuestionCount = questionRepo.countBySubject_Id(id);
 
         if (hasRole(authentication, ROLE_ADMIN)) {
-            if (linkedQuestionCount > 0) {
-                questionRepo.deleteBySubject_Id(id);
-            }
+            cleanupSubjectRelatedData(id);
             subjectRepo.delete(subject);
             return "Subject deleted successfully. " + linkedExamCount + " linked exam(s) and "
                     + linkedQuestionCount + " linked question(s) were also deleted.";
@@ -115,9 +116,7 @@ public class ExamServiceImpl implements ExamService {
                     "Teachers can delete only subjects whose linked exams were created by them");
         }
 
-        if (linkedQuestionCount > 0) {
-            questionRepo.deleteBySubject_Id(id);
-        }
+        cleanupSubjectRelatedData(id);
         subjectRepo.delete(subject);
         return "Subject deleted successfully. " + linkedExamCount + " linked exam(s) and "
                 + linkedQuestionCount + " linked question(s) created under this subject were also deleted.";
@@ -228,6 +227,11 @@ public class ExamServiceImpl implements ExamService {
         // Delete all related data before deleting the exam
         Long examIdLong = (long) id;
         studentAnswerRepo.deleteByExamId(examIdLong);
+        // Delete score_review_history for each result before deleting results
+        List<Result> examResults = resultRepo.findByExamId(examIdLong);
+        for (Result r : examResults) {
+            scoreReviewHistoryRepo.deleteByResultId(r.getId());
+        }
         resultRepo.deleteByExamId(examIdLong);
         examEnrollmentRepo.deleteByExamId(examIdLong);
         questionRepo.deleteByExam_Id(id);
@@ -265,6 +269,23 @@ public class ExamServiceImpl implements ExamService {
             exam.setStatus(newStatus);
             examRepo.save(exam);
         }
+    }
+
+    private void cleanupSubjectRelatedData(int subjectId) {
+        // For each exam under this subject, clean up answers, review history, results, enrollments
+        List<Exams> exams = examRepo.findBySubject_Id(subjectId);
+        for (Exams exam : exams) {
+            Long examIdLong = (long) exam.getId();
+            studentAnswerRepo.deleteByExamId(examIdLong);
+            List<Result> results = resultRepo.findByExamId(examIdLong);
+            for (Result r : results) {
+                scoreReviewHistoryRepo.deleteByResultId(r.getId());
+            }
+            resultRepo.deleteByExamId(examIdLong);
+            examEnrollmentRepo.deleteByExamId(examIdLong);
+        }
+        // Delete all questions under this subject
+        questionRepo.deleteBySubject_Id(subjectId);
     }
 
     private ExamResponse toResponse(Exams exam) {

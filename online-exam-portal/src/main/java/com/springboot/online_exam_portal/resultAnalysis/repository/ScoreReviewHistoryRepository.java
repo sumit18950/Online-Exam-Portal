@@ -11,4 +11,5 @@ public interface ScoreReviewHistoryRepository
 
    // ResultResponseDTO reviewResult(ResultReviewRequestDTO request);
     List<ScoreReviewHistory> findByResultId(Long resultId);
+    void deleteByResultId(Long resultId);
 }
