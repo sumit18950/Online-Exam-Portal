@@ -58,7 +58,7 @@ export const ViewResults = () => {
                 (result.grade || '').toLowerCase().includes(term)
               );
             }).map((result) => (
-              <div key={result.id} className="result-card result-card-clickable" onClick={() => navigate(`/student/results/${result.examId}/feedback`)}>
+              <div key={result.id} className="result-card">
                 <h3>{result.examTitle || `Exam ${result.examId}`}</h3>
                 <div className="result-details">
                   <div className="detail-item">
@@ -78,7 +78,10 @@ export const ViewResults = () => {
                     </span>
                   </div>
                 </div>
-                <div className="result-card-hint">Click to view detailed feedback</div>
+                <div className="result-card-actions">
+                  <button className="btn btn-primary" onClick={() => navigate(`/student/results/${result.examId}/feedback`)}>View Feedback</button>
+                  <button className="btn btn-secondary" onClick={() => navigate(`/student/leaderboard/${result.examId}`)}>Leaderboard</button>
+                </div>
               </div>
             ))}
           </div>

@@ -1,10 +1,12 @@
 import { useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import './Navbar.css';
 
 export const Navbar = () => {
   const { isAuthenticated, role, logout } = useContext(AuthContext);
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -41,6 +43,7 @@ export const Navbar = () => {
             <Link to="/student-dashboard" className="nav-link">Dashboard</Link>
             <Link to="/student/exams" className="nav-link">View Exams</Link>
             <Link to="/student/results" className="nav-link">My Results</Link>
+            <Link to="/student/leaderboard" className="nav-link">Leaderboard</Link>
           </>
         );
       default:
@@ -61,10 +64,16 @@ export const Navbar = () => {
               {renderRoleLinks()}
               <Link to="/profile" className="nav-link">Profile</Link>
               <span className="nav-role-badge">{role}</span>
+              <button onClick={toggleTheme} className="theme-toggle" title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}>
+                {theme === 'light' ? '\u263E' : '\u2600'}
+              </button>
               <button onClick={handleLogout} className="nav-link logout-btn">Logout</button>
             </>
           ) : (
             <>
+              <button onClick={toggleTheme} className="theme-toggle" title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}>
+                {theme === 'light' ? '\u263E' : '\u2600'}
+              </button>
               <Link to="/login" className="nav-link">Login</Link>
               <Link to="/register" className="nav-link">Register</Link>
             </>

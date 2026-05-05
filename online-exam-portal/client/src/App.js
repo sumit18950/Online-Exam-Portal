@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 import { Navbar } from './components/Navbar';
 import { ProtectedRoute } from './components/ProtectedRoute';
 
@@ -31,6 +32,7 @@ import { ViewExams } from './pages/student/ViewExams';
 import { AttemptExam } from './pages/student/AttemptExam';
 import { ViewResults } from './pages/student/ViewResults';
 import { ExamFeedback } from './pages/student/ExamFeedback';
+import { Leaderboard } from './pages/student/Leaderboard';
 
 import { Home, Unauthorized, NotFound } from './pages/Pages';
 
@@ -38,6 +40,7 @@ import './App.css';
 
 function App() {
   return (
+    <ThemeProvider>
     <Router>
       <AuthProvider>
         <Navbar />
@@ -77,12 +80,15 @@ function App() {
           <Route path="/student/exams/:examId/attempt" element={<ProtectedRoute requiredRole="STUDENT"><AttemptExam /></ProtectedRoute>} />
           <Route path="/student/results" element={<ProtectedRoute requiredRole="STUDENT"><ViewResults /></ProtectedRoute>} />
           <Route path="/student/results/:examId/feedback" element={<ProtectedRoute requiredRole="STUDENT"><ExamFeedback /></ProtectedRoute>} />
+          <Route path="/student/leaderboard" element={<ProtectedRoute requiredRole="STUDENT"><Leaderboard /></ProtectedRoute>} />
+          <Route path="/student/leaderboard/:examId" element={<ProtectedRoute requiredRole="STUDENT"><Leaderboard /></ProtectedRoute>} />
 
           {/* Fallback */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </AuthProvider>
     </Router>
+    </ThemeProvider>
   );
 }
 
