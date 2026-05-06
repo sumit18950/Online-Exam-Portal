@@ -1,6 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
+
 import { Navbar } from './components/Navbar';
 import { ProtectedRoute } from './components/ProtectedRoute';
 
@@ -38,8 +40,11 @@ import { Home, Unauthorized, NotFound } from './pages/Pages';
 
 import './App.css';
 
+const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID || 'YOUR_GOOGLE_CLIENT_ID_HERE';
+
 function App() {
   return (
+    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
     <ThemeProvider>
     <Router>
       <AuthProvider>
@@ -89,6 +94,7 @@ function App() {
       </AuthProvider>
     </Router>
     </ThemeProvider>
+    </GoogleOAuthProvider>
   );
 }
 

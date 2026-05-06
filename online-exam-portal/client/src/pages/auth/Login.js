@@ -1,5 +1,6 @@
 import { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { GoogleLogin } from '@react-oauth/google';
 import api from '../../services/api';
 import { storeToken, storeUserData, extractRole } from '../../utils/authUtil';
 import { AuthContext } from '../../context/AuthContext';
@@ -19,13 +20,33 @@ export const Login = () => {
     return payload?.message || payload?.error || err.message || fallback;
   };
 
+  const completeLogin = async (token) => {
+    storeToken(token);
+    const profileResponse = await api.get('/api/users/profile');
+    const userData = profileResponse.data;
+    storeUserData(userData);
+
+    const role = extractRole(userData.role);
+    login(token, { id: userData.id, username: userData.username, email: userData.email, role: userData.role });
+
+    switch (role) {
+      case 'ADMIN':
+        navigate('/admin-dashboard');
+        break;
+      case 'TEACHER':
+        navigate('/teacher-dashboard');
+        break;
+      default:
+        navigate('/student-dashboard');
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
     try {
-      // Step 1: Login and get JWT token
       const response = await api.post('/api/auth/login', { email, password });
       const token = typeof response.data === 'string'
         ? response.data
@@ -35,32 +56,39 @@ export const Login = () => {
         throw new Error('Token not received from server');
       }
 
-      storeToken(token);
-
-      // Step 2: Fetch user profile to get role (JWT only contains email)
-      const profileResponse = await api.get('/api/users/profile');
-      const userData = profileResponse.data;
-      storeUserData(userData);
-
-      const role = extractRole(userData.role);
-      login(token, { id: userData.id, username: userData.username, email: userData.email, role: userData.role });
-
-      // Step 3: Redirect to role-based dashboard
-      switch (role) {
-        case 'ADMIN':
-          navigate('/admin-dashboard');
-          break;
-        case 'TEACHER':
-          navigate('/teacher-dashboard');
-          break;
-        default:
-          navigate('/student-dashboard');
-      }
+      await completeLogin(token);
     } catch (err) {
       setError(getErrorMessage(err, 'Login failed. Please check your credentials.'));
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    setError('');
+    setLoading(true);
+    try {
+      const response = await api.post('/api/auth/google', {
+        credential: credentialResponse.credential,
+      });
+      const token = typeof response.data === 'string'
+        ? response.data
+        : response.data?.token;
+
+      if (!token) {
+        throw new Error('Token not received from server');
+      }
+
+      await completeLogin(token);
+    } catch (err) {
+      setError(getErrorMessage(err, 'Google login failed. Please try again.'));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleError = () => {
+    setError('Google login was cancelled or failed. Please try again.');
   };
 
   return (
@@ -95,6 +123,22 @@ export const Login = () => {
             {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
+
+        <div className="auth-divider">
+          <span>OR</span>
+        </div>
+
+        <div className="google-btn-wrapper">
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onError={handleGoogleError}
+            text="signin_with"
+            shape="rectangular"
+            size="large"
+            width="100%"
+          />
+        </div>
+
         <p className="form-footer">
           Don't have an account? <Link to="/register">Register here</Link>
         </p>

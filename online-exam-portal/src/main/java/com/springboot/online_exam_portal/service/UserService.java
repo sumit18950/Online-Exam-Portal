@@ -13,6 +13,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.Locale;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -53,6 +55,22 @@ public class UserService {
 
         Role role = findRoleOrThrow(request.getRole());
         User user = buildUser(request.getUsername(), request.getEmail(), request.getPassword(), role);
+        return userRepository.save(user);
+    }
+
+    public User findOrCreateGoogleUser(String email, String name) {
+        Optional<User> existing = userRepository.findByEmail(email);
+        if (existing.isPresent()) {
+            return existing.get();
+        }
+
+        Role role = findRoleOrThrow(DEFAULT_REGISTRATION_ROLE);
+        User user = new User();
+        user.setUsername(name != null && !name.isBlank() ? name : email.split("@")[0]);
+        user.setEmail(email);
+        user.setPasswordHash(passwordEncoder.encode(UUID.randomUUID().toString()));
+        user.setRole(role);
+        user.setCreatedAt(LocalDateTime.now());
         return userRepository.save(user);
     }
 
